@@ -685,7 +685,7 @@ add_filter('the_content','rei_add_to_cart_button', 20,1);
 function rei_add_to_cart_button($content){
 	global $post;
 	if ($post->post_type !== 'post') {return $content; }
-	
+
 	ob_start();
 	?>
 	<form action="" method="post">
@@ -694,7 +694,7 @@ function rei_add_to_cart_button($content){
 		<input name="submit" type="submit" value="Add to cart" />
 	</form>
 	<?php
-	
+
 	return $content . ob_get_clean();
 }
 
@@ -743,3 +743,87 @@ function addMyCustomMeta( $user_id ) {
     }
 }
 add_action( 'user_register', 'addMyCustomMeta', 10, 2 );
+
+/* redirect after registration */
+function custom_registration_redirect() {
+    return home_url( '/favourites' );
+}
+
+add_filter( 'registration_redirect', 'custom_registration_redirect' );
+
+/* add to favourites */
+add_filter('the_content','add_to_favourites_button', 25,1);
+function add_to_favourites_button($content){
+    if (!is_page('39')) {
+        global $post;
+        if ($post->post_type !== 'post' || !is_user_logged_in()) {return $content; }
+
+        ob_start();
+        ?>
+        <button class="add_favourite" data-id="<?php echo $post->ID; ?>">Add to favourites</button>
+        <?php
+
+        return $content . ob_get_clean();
+    }
+}
+
+add_action('wp_enqueue_scripts', 'add_to_favourites_scripts');
+function add_to_favourites_scripts() {
+    wp_enqueue_script('favourites', get_template_directory_uri() . '/js/favourites.js', array('jquery'), '1.0', true);
+
+    wp_localize_script( 'favourites', 'favourites', array(
+        'ajaxurl' => admin_url( 'admin-ajax.php' )
+    ));
+}
+
+add_action( 'wp_ajax_nopriv_add_to_favourites', 'my_add_to_favourites' );
+add_action( 'wp_ajax_add_to_favourites', 'my_add_to_favourites' );
+
+function my_add_to_favourites() {
+
+    $array = array();
+
+    $post_id = $_POST['id'];
+
+    if (!is_user_logged_in()) die();
+
+    $user = wp_get_current_user();
+
+    if(get_user_meta( $user->ID, 'favourites' )) {
+
+        $user = get_userdata($user->ID);
+        $data = $user->favourites;
+
+        if (in_array($post_id, $data)) {
+            die();
+        } else {
+            $data[] = $post_id;
+            update_user_meta($user->ID, 'favourites', $data);
+        }
+
+    } else {
+
+        $array[] = $post_id;
+        add_user_meta($user->ID, 'favourites', $array);
+    }
+
+    var_dump(get_user_meta( $user->ID, 'favourites'));
+
+    die();
+}
+
+function get_user_favourites() {
+
+    $user = wp_get_current_user();
+
+    $meta = get_user_meta( $user->ID, 'favourites');
+
+    $args = array(
+        'post__in' => $meta[0]
+    );
+
+    $posts = get_posts($args);
+
+    return $posts;
+
+}
