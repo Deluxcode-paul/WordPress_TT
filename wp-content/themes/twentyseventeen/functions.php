@@ -720,11 +720,18 @@ add_filter('the_content','add_to_favourites_button', 25,1);
 function add_to_favourites_button($content){
     if (!is_page('39')) {
         global $post;
-        if ($post->post_type !== 'film' || !is_user_logged_in()) {return $content; }
+        if ($post->post_type !== 'film') {return $content;}
 
         ob_start();
+
+        if (!is_user_logged_in()) { ?>
+        	<a href="/wp-login.php?action=register" class="add_favourit_link">Add to favourites</a>
+        <?php } else { ?>
+        	<button class="add_favourite" data-id="<?php echo $post->ID; ?>">Add to favourites</button>
+        <?php }
+
         ?>
-        <button class="add_favourite" data-id="<?php echo $post->ID; ?>">Add to favourites</button>
+
         <?php
 
         return $content . ob_get_clean();
@@ -771,7 +778,7 @@ function my_add_to_favourites() {
         add_user_meta($user->ID, 'favourites', $array);
     }
 
-    var_dump(get_user_meta( $user->ID, 'favourites'));
+    //var_dump(get_user_meta( $user->ID, 'favourites'));
 
     die();
 }
