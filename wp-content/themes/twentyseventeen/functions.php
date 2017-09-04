@@ -567,47 +567,6 @@ require get_parent_theme_file_path( '/inc/customizer.php' );
 require get_parent_theme_file_path( '/inc/icon-functions.php' );
 
 
-
-
-
-
-
-
-
-/*add_action( 'init', 'film_post_type' );
-function film_post_type() {
-    register_post_type( 'film',
-        array(
-            'labels' => array(
-                'name' => __( 'Films' ),
-                'singular_name' => __( 'Film' )
-            ),
-        'capability_type' => 'product',
-        'supports' => array('title','editor','thumbnail', 'excerpt', 'custom-fields', 'comments','revisions', 'archives'),   
-        'public' => true,
-        'has_archive' => true,
-        'rewrite' => array( 'slug' => 'films' ),
-        )
-    );
-}
-
-function films_init() {
-    // create a new taxonomy
-    register_taxonomy(
-        'film',
-        'film',
-        array(
-            'label' => __( 'Categories' ),
-            'sort' => true,
-            'hierarchical' => true,
-            'args' => array( 'orderby' => 'term_order' ),
-            'rewrite' => array( 'slug' => 'filmscat' )
-        )
-    );
-}
-add_action( 'init', 'films_init' );*/
-
-
 /* Post type Films 
 -----------------------------------------------------------*/
 add_action( 'init', 'films_init' );
@@ -664,38 +623,43 @@ function films_init() {
     'map_meta_cap'        => true,
     'hierarchical'        => false,
     'rewrite'             => array( 'slug'=>'films', 'with_front'=>false, 'pages'=>false, 'feeds'=>false, 'feed'=>false ),
-    'has_archive'         => 'films',
+    'has_archive'         => false,
     'query_var'           => true,    
     'supports'              => array('title','editor','thumbnail', 'excerpt', 'custom-fields', 'comments','revisions', 'archives'),
-    'taxonomies'          => array( 'filmscat', 'film', 'post_tag' ),
+    'taxonomy'          => array( 'filmscat', 'film', 'post_tag' ),
   ) );
 
 }
 
 
-/*add_filter('woocommerce_get_price','reigel_woocommerce_get_price',20,2);
-function reigel_woocommerce_get_price($price,$post){
-	if ($post->post->post_type === 'film')
-		$price = get_post_meta($post->id, "price", true);
-	return $price;
-}*/
-
-
 add_filter('the_content','rei_add_to_cart_button', 20,1);
 function rei_add_to_cart_button($content){
 	global $post;
-	if ($post->post_type !== 'post') {return $content; }
 
-	ob_start();
-	?>
-	<form action="" method="post">
-		<input name="add-to-cart" type="hidden" value="<?php echo $post->ID ?>" />
-		<input name="quantity" type="number" value="1" min="1"  />
-		<input name="submit" type="submit" value="Add to cart" />
-	</form>
-	<?php
+		if ($post->post_type !== 'film') {return $content; }
 
-	return $content . ob_get_clean();
+		ob_start();
+		?>
+	
+		$<?php echo $price = get_post_meta( get_the_ID(), 'price', true ); ?>
+
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		  <input type="hidden" name="cmd" value="_xclick">		  
+			<input type="hidden" name="hosted_button_id" value="<?php echo $post->ID ?>">
+		  <input type="hidden" name="item_name" value="<?php echo $post->post_title; ?>">
+		  <input type="hidden" name="business" value="hello@deluxcode.com">
+		  <input type="hidden" name="amount" value="<?php echo get_post_meta( get_the_ID(), 'price', true ); ?>">
+		  <input type="image"
+		    src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" alt="Buy Now">
+		  <img alt="" src="https://paypalobjects.com/en_US/i/scr/pixel.gif"
+		    width="1" height="1">
+		</form>
+
+
+
+		<?php
+
+		return $content . ob_get_clean();
 }
 
 /* render skype meta data in admin panel */
@@ -756,7 +720,7 @@ add_filter('the_content','add_to_favourites_button', 25,1);
 function add_to_favourites_button($content){
     if (!is_page('39')) {
         global $post;
-        if ($post->post_type !== 'post' || !is_user_logged_in()) {return $content; }
+        if ($post->post_type !== 'film' || !is_user_logged_in()) {return $content; }
 
         ob_start();
         ?>
@@ -819,7 +783,8 @@ function get_user_favourites() {
     $meta = get_user_meta( $user->ID, 'favourites');
 
     $args = array(
-        'post__in' => $meta[0]
+        'post__in' => $meta[0],
+        'post_type'   => 'film'
     );
 
     $posts = get_posts($args);

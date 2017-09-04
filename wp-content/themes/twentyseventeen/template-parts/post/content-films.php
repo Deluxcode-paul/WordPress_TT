@@ -23,7 +23,7 @@
 	?>
 	<header class="entry-header">
 		<?php
-		if ( 'post' === get_post_type() ) {
+		if ( 'film' === get_post_type() ) {
 			echo '<div class="entry-meta">';
 				if ( is_single() ) {
 					twentyseventeen_posted_on();
@@ -42,13 +42,23 @@
 			the_title( '<h2 class="entry-title"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h2>' );
 		}
 		?>
-		<?php echo get_post_meta( get_the_ID(), 'sub-title', true ); ?>
 
-		<?php echo wp_list_categories( array(
-        		'taxonomy' => 'filmscat',
-        		'title_li' => '<h3><strong>' . __( 'Categories', 'textdomain' ) . '</strong></h3>'
-		        ));
+		<?php echo get_post_meta( get_the_ID(), 'sub-title', true ); ?> <br/>
+
+		<?php 
+			$categories = get_terms( array( 
+			    'taxonomies' => 'filmscat'
+			) );
+
+			$cats = '';
+
+			foreach ($categories as $cat) {
+				$cats .= "<a href='" . get_category_link($cat) ."'>" . $cat->name . "</a>";
+			}
+
+			echo 'Category: ' . $cats;
 		?>
+
 	</header><!-- .entry-header -->
 
 	<?php if ( '' !== get_the_post_thumbnail() && ! is_single() ) : ?>
@@ -59,7 +69,7 @@
 		</div><!-- .post-thumbnail -->
 	<?php endif; ?>
 
-	<div class="entry-content">
+	<div class="content">
 		<?php
 		/* translators: %s: Name of current post */
 		the_content( sprintf(
