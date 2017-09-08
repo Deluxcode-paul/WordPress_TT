@@ -207,7 +207,7 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @global string $mode List table view mode.
+	 * @global string $mode
 	 *
 	 * @param string $which
 	 */
@@ -295,7 +295,7 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 	 * @since 4.3.0
 	 * @access public
 	 *
-	 * @global string $mode List table view mode.
+	 * @global string $mode
 	 *
 	 * @param array $blog Current site.
 	 */
@@ -315,7 +315,7 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 		if ( ! empty( $blog_states ) ) {
 			$state_count = count( $blog_states );
 			$i = 0;
-			$blog_state .= ' &mdash; ';
+			$blog_state .= ' - ';
 			foreach ( $blog_states as $state ) {
 				++$i;
 				$sep = ( $i == $state_count ) ? '' : ', ';
@@ -324,10 +324,7 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 		}
 
 		?>
-		<strong>
-			<a href="<?php echo esc_url( network_admin_url( 'site-info.php?id=' . $blog['blog_id'] ) ); ?>" class="edit"><?php echo $blogname; ?></a>
-			<?php echo $blog_state; ?>
-		</strong>
+		<a href="<?php echo esc_url( network_admin_url( 'site-info.php?id=' . $blog['blog_id'] ) ); ?>" class="edit"><?php echo $blogname . $blog_state; ?></a>
 		<?php
 		if ( 'list' !== $mode ) {
 			switch_to_blog( $blog['blog_id'] );
@@ -349,8 +346,6 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 	 * @since 4.3.0
 	 * @access public
 	 *
-	 * @global string $mode List table view mode.
-	 *
 	 * @param array $blog Current site.
 	 */
 	public function column_lastupdated( $blog ) {
@@ -370,8 +365,6 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 	 *
 	 * @since 4.3.0
 	 * @access public
-	 *
-	 * @global string $mode List table view mode.
 	 *
 	 * @param array $blog Current site.
 	 */
@@ -549,7 +542,7 @@ class WP_MS_Sites_List_Table extends WP_List_Table {
 			}
 		}
 
-		$actions['visit']	= "<a href='" . esc_url( get_home_url( $blog['blog_id'], '/' ) ) . "' rel='bookmark'>" . __( 'Visit' ) . '</a>';
+		$actions['visit']	= "<a href='" . esc_url( get_home_url( $blog['blog_id'], '/' ) ) . "' rel='permalink'>" . __( 'Visit' ) . '</a>';
 
 		/**
 		 * Filters the action links displayed for each site in the Sites list table.

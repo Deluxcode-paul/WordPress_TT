@@ -18,9 +18,6 @@
  */
 class WP_Customize_Setting {
 	/**
-	 * Customizer bootstrap instance.
-	 *
-	 * @since 3.4.0
 	 * @access public
 	 * @var WP_Customize_Manager
 	 */
@@ -29,16 +26,12 @@ class WP_Customize_Setting {
 	/**
 	 * Unique string identifier for the setting.
 	 *
-	 * @since 3.4.0
 	 * @access public
 	 * @var string
 	 */
 	public $id;
 
 	/**
-	 * Type of customize settings.
-	 *
-	 * @since 3.4.0
 	 * @access public
 	 * @var string
 	 */
@@ -47,69 +40,27 @@ class WP_Customize_Setting {
 	/**
 	 * Capability required to edit this setting.
 	 *
-	 * @since 3.4.0
-	 * @access public
-	 * @var string|array
+	 * @var string
 	 */
 	public $capability = 'edit_theme_options';
 
 	/**
 	 * Feature a theme is required to support to enable this setting.
 	 *
-	 * @since 3.4.0
 	 * @access public
 	 * @var string
 	 */
-	public $theme_supports = '';
+	public $theme_supports  = '';
+	public $default         = '';
+	public $transport       = 'refresh';
 
 	/**
-	 * The default value for the setting.
+	 * Server-side sanitization callback for the setting's value.
 	 *
-	 * @since 3.4.0
-	 * @access public
-	 * @var string
+	 * @var callback
 	 */
-	public $default = '';
-
-	/**
-	 * Options for rendering the live preview of changes in Theme Customizer.
-	 *
-	 * Set this value to 'postMessage' to enable a custom Javascript handler to render changes to this setting
-	 * as opposed to reloading the whole page.
-	 *
-	 * @link https://developer.wordpress.org/themes/customize-api
-	 *
-	 * @since 3.4.0
-	 * @access public
-	 * @var string
-	 */
-	public $transport = 'refresh';
-
-	/**
-	 * Server-side validation callback for the setting's value.
-	 *
-	 * @since 4.6.0
-	 * @access public
-	 * @var callable
-	 */
-	public $validate_callback = '';
-
-	/**
-	 * Callback to filter a Customize setting value in un-slashed form.
-	 *
-	 * @since 3.4.0
-	 * @access public
-	 * @var callable
-	 */
-	public $sanitize_callback = '';
-
-	/**
-	 * Callback to convert a Customize PHP setting value to a value that is JSON serializable.
-	 *
-	 * @since 3.4.0
-	 * @access public
-	 * @var string
-	 */
+	public $validate_callback    = '';
+	public $sanitize_callback    = '';
 	public $sanitize_js_callback = '';
 
 	/**
@@ -127,10 +78,6 @@ class WP_Customize_Setting {
 	public $dirty = false;
 
 	/**
-	 * ID Data.
-	 *
-	 * @since 3.4.0
-	 * @access protected
 	 * @var array
 	 */
 	protected $id_data = array();
@@ -148,9 +95,9 @@ class WP_Customize_Setting {
 	 * Cache of multidimensional values to improve performance.
 	 *
 	 * @since 4.4.0
-	 * @static
 	 * @access protected
 	 * @var array
+	 * @static
 	 */
 	protected static $aggregated_multidimensionals = array();
 
@@ -221,6 +168,7 @@ class WP_Customize_Setting {
 	 * Get parsed ID data for multidimensional setting.
 	 *
 	 * @since 4.4.0
+	 * @access public
 	 *
 	 * @return array {
 	 *     ID data for multidimensional setting.
@@ -240,6 +188,7 @@ class WP_Customize_Setting {
 	 * calls get combined into one call, greatly improving performance.
 	 *
 	 * @since 4.4.0
+	 * @access protected
 	 */
 	protected function aggregate_multidimensional() {
 		$id_base = $this->id_data['base'];
@@ -267,6 +216,7 @@ class WP_Customize_Setting {
 	 * This is intended only for use by unit tests.
 	 *
 	 * @since 4.5.0
+	 * @access public
 	 * @ignore
 	 */
 	static public function reset_aggregated_multidimensionals() {
@@ -286,6 +236,7 @@ class WP_Customize_Setting {
 	 * Return true if the current site is not the same as the previewed site.
 	 *
 	 * @since 4.2.0
+	 * @access public
 	 *
 	 * @return bool If preview() has been called.
 	 */
@@ -301,7 +252,6 @@ class WP_Customize_Setting {
 	 *
 	 * @see WP_Customize_Setting::preview()
 	 * @since 4.1.1
-	 * @access protected
 	 * @var mixed
 	 */
 	protected $_original_value;
@@ -315,6 +265,7 @@ class WP_Customize_Setting {
 	 *
 	 * @since 3.4.0
 	 * @since 4.4.0 Added boolean return value.
+	 * @access public
 	 *
 	 * @return bool False when preview short-circuits due no change needing to be previewed.
 	 */
@@ -428,7 +379,7 @@ class WP_Customize_Setting {
 	 * is called for this setting.
 	 *
 	 * @since 4.4.0
-	 *
+	 * @access private
 	 * @see WP_Customize_Manager::set_post_value()
 	 * @see WP_Customize_Setting::_multidimensional_preview_filter()
 	 */
@@ -475,6 +426,7 @@ class WP_Customize_Setting {
 	 * the first setting previewed will be used to apply the values for the others.
 	 *
 	 * @since 4.4.0
+	 * @access private
 	 *
 	 * @see WP_Customize_Setting::$aggregated_multidimensionals
 	 * @param mixed $original Original root value.
@@ -517,6 +469,8 @@ class WP_Customize_Setting {
 	 *
 	 * @since 3.4.0
 	 *
+	 * @access public
+	 *
 	 * @return false|void False if cap check fails or value isn't set or is invalid.
 	 */
 	final public function save() {
@@ -526,19 +480,17 @@ class WP_Customize_Setting {
 			return false;
 		}
 
-		$id_base = $this->id_data['base'];
-
 		/**
 		 * Fires when the WP_Customize_Setting::save() method is called.
 		 *
-		 * The dynamic portion of the hook name, `$id_base` refers to
+		 * The dynamic portion of the hook name, `$this->id_data['base']` refers to
 		 * the base slug of the setting name.
 		 *
 		 * @since 3.4.0
 		 *
 		 * @param WP_Customize_Setting $this WP_Customize_Setting instance.
 		 */
-		do_action( "customize_save_{$id_base}", $this );
+		do_action( 'customize_save_' . $this->id_data['base'], $this );
 
 		$this->update( $value );
 	}
@@ -582,6 +534,7 @@ class WP_Customize_Setting {
 	 * Validates an input.
 	 *
 	 * @since 4.6.0
+	 * @access public
 	 *
 	 * @see WP_REST_Request::has_valid_params()
 	 *
@@ -623,6 +576,7 @@ class WP_Customize_Setting {
 	 * Get the root value for a setting, especially for multidimensional ones.
 	 *
 	 * @since 4.4.0
+	 * @access protected
 	 *
 	 * @param mixed $default Value to return if root does not exist.
 	 * @return mixed
@@ -647,6 +601,7 @@ class WP_Customize_Setting {
 	 * Set the root value for a setting, especially for multidimensional ones.
 	 *
 	 * @since 4.4.0
+	 * @access protected
 	 *
 	 * @param mixed $value Value to set as root of multidimensional setting.
 	 * @return bool Whether the multidimensional root was updated successfully.
@@ -813,6 +768,7 @@ class WP_Customize_Setting {
 	 * Retrieves the data to export to the client via JSON.
 	 *
 	 * @since 4.6.0
+	 * @access public
 	 *
 	 * @return array Array of parameters passed to JavaScript.
 	 */
@@ -949,27 +905,17 @@ class WP_Customize_Setting {
 	}
 }
 
-/**
- * WP_Customize_Filter_Setting class.
- */
+/** WP_Customize_Filter_Setting class */
 require_once( ABSPATH . WPINC . '/customize/class-wp-customize-filter-setting.php' );
 
-/**
- * WP_Customize_Header_Image_Setting class.
- */
+/** WP_Customize_Header_Image_Setting class */
 require_once( ABSPATH . WPINC . '/customize/class-wp-customize-header-image-setting.php' );
 
-/**
- * WP_Customize_Background_Image_Setting class.
- */
+/** WP_Customize_Background_Image_Setting class */
 require_once( ABSPATH . WPINC . '/customize/class-wp-customize-background-image-setting.php' );
 
-/**
- * WP_Customize_Nav_Menu_Item_Setting class.
- */
+/** WP_Customize_Nav_Menu_Item_Setting class */
 require_once( ABSPATH . WPINC . '/customize/class-wp-customize-nav-menu-item-setting.php' );
 
-/**
- * WP_Customize_Nav_Menu_Setting class.
- */
+/** WP_Customize_Nav_Menu_Setting class */
 require_once( ABSPATH . WPINC . '/customize/class-wp-customize-nav-menu-setting.php' );

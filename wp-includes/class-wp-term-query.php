@@ -173,12 +173,9 @@ class WP_Term_Query {
 	 *     @type array        $meta_query             Optional. Meta query clauses to limit retrieved terms by.
 	 *                                                See `WP_Meta_Query`. Default empty.
 	 *     @type string       $meta_key               Limit terms to those matching a specific metadata key.
-	 *                                                Can be used in conjunction with `$meta_value`. Default empty.
+	 *                                                Can be used in conjunction with `$meta_value`.
 	 *     @type string       $meta_value             Limit terms to those matching a specific metadata value.
-	 *                                                Usually used in conjunction with `$meta_key`. Default empty.
-	 *     @type string       $meta_type              Type of object metadata is for (e.g., comment, post, or user).
-	 *                                                Default empty.
-	 *     @type string       $meta_compare           Comparison operator to test the 'meta_value'. Default empty.
+	 *                                                Usually used in conjunction with `$meta_key`.
 	 * }
 	 */
 	public function __construct( $query = '' ) {
@@ -297,18 +294,18 @@ class WP_Term_Query {
 	/**
 	 * Get terms, based on query_vars.
 	 *
-	 * @since 4.6.0
+	 * @param 4.6.0
 	 * @access public
 	 *
 	 * @global wpdb $wpdb WordPress database abstraction object.
 	 *
-	 * @return array List of terms.
+	 * @return array
 	 */
 	public function get_terms() {
 		global $wpdb;
 
 		$this->parse_query( $this->query_vars );
-		$args = &$this->query_vars;
+		$args = $this->query_vars;
 
 		// Set up meta_query so it's available to 'pre_get_terms'.
 		$this->meta_query = new WP_Meta_Query();
@@ -323,7 +320,7 @@ class WP_Term_Query {
 		 */
 		do_action( 'pre_get_terms', $this );
 
-		$taxonomies = (array) $args['taxonomy'];
+		$taxonomies = $args['taxonomy'];
 
 		// Save queries by not crawling the tree in the case of multiple taxes or a flat tax.
 		$has_hierarchical_tax = false;
@@ -474,10 +471,7 @@ class WP_Term_Query {
 			$this->sql_clauses['where']['exclusions'] = preg_replace( '/^\s*AND\s*/', '', $exclusions );
 		}
 
-		if (
-			( ! empty( $args['name'] ) ) ||
-			( is_string( $args['name'] ) && 0 !== strlen( $args['name'] ) )
-		) {
+		if ( ! empty( $args['name'] ) ) {
 			$names = (array) $args['name'];
 			foreach ( $names as &$_name ) {
 				// `sanitize_term_field()` returns slashed data.
@@ -487,10 +481,7 @@ class WP_Term_Query {
 			$this->sql_clauses['where']['name'] = "t.name IN ('" . implode( "', '", array_map( 'esc_sql', $names ) ) . "')";
 		}
 
-		if (
-			( ! empty( $args['slug'] ) ) ||
-			( is_string( $args['slug'] ) && 0 !== strlen( $args['slug'] ) )
-		) {
+		if ( ! empty( $args['slug'] ) ) {
 			if ( is_array( $args['slug'] ) ) {
 				$slug = array_map( 'sanitize_title', $args['slug'] );
 				$this->sql_clauses['where']['slug'] = "t.slug IN ('" . implode( "', '", $slug ) . "')";
@@ -879,10 +870,10 @@ class WP_Term_Query {
 	 * Generate the ORDER BY clause for an 'orderby' param that is potentially related to a meta query.
 	 *
 	 * @since 4.6.0
-	 * @access protected
+	 * @access public
 	 *
 	 * @param string $orderby_raw Raw 'orderby' value passed to WP_Term_Query.
-	 * @return string ORDER BY clause.
+	 * @return string
 	 */
 	protected function parse_orderby_meta( $orderby_raw ) {
 		$orderby = '';

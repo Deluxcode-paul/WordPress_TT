@@ -2,6 +2,8 @@
  * Twenty Seventeen integration styles
  */
 
+@import 'bourbon';
+
 /**
  * Fonts
  */
@@ -32,7 +34,7 @@
  */
 @mixin link() {
 	box-shadow: 0 1px 0 rgba(15, 15, 15, 1);
-	transition: box-shadow ease-in-out 130ms;
+	@include transition( box-shadow ease-in-out 130ms );
 
 	&:hover {
 		box-shadow: 0 3px 0 rgba(15, 15, 15, 1);
@@ -42,7 +44,7 @@
 @mixin link_white() {
 	color: #fff;
 	box-shadow: 0 1px 0 rgba(#fff, 1) !important;
-	transition: box-shadow ease-in-out 130ms;
+	@include transition( box-shadow ease-in-out 130ms );
 
 	&:hover {
 		color: #fff !important;
@@ -53,6 +55,35 @@
 /**
  * Global elements
  */
+.woocommerce-demo-store {
+	padding-top: 3.5em;
+}
+
+p.demo_store {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	margin: 0;
+	width: 100%;
+	font-size: 1em;
+	padding: 1em 0;
+	text-align: center;
+	background-color: #767676;
+	color: #fff;
+	z-index: 99998;
+	box-shadow: 0 1px 1em rgba(0,0,0,0.2);
+	a {
+		color: #fff;
+	}
+}
+
+.admin-bar {
+	p.demo_store {
+		top: 32px;
+	}
+}
+
 .woocommerce-breadcrumb {
 	padding-bottom: 2em;
 	margin-bottom: 4em;
@@ -88,7 +119,7 @@
 		float: none;
 		line-height: 1.5;
 		border-radius: 2px;
-		transition: background-color ease-in-out .3s;
+		@include transition( background-color ease-in-out .3s );
 	}
 
 	span.page-numbers {
@@ -270,6 +301,7 @@ a.remove {
 	text-align: center;
 	border-radius: 100%;
 	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
 	border: 1px solid #000;
 
 	&:hover {
@@ -278,24 +310,16 @@ a.remove {
 	}
 }
 
-dl.variation, .wc-item-meta {
-	list-style: none outside;
-
-	dt, .wc-item-meta-label {
+dl.variation {
+	dt {
 		float: left;
 		clear: both;
 		margin-right: .25em;
 		display: inline-block;
-		list-style: none outside;
 	}
 
 	dd {
 		margin: 0;
-	}
-
-	p,
-	&:last-child {
-		margin-bottom: 0;
 	}
 }
 
@@ -369,15 +393,6 @@ table.variations {
 		margin: 0;
 	}
 
-	.zoomImg {
-		background-color: #fff;
-	}
-
-	.woocommerce-product-gallery__image:nth-child(n+2) {
-		width: 25%;
-		display: inline-block;
-	}
-
 	.flex-control-thumbs {
 		li {
 			list-style: none;
@@ -404,26 +419,17 @@ table.variations {
 	.flex-control-thumbs li {
 		width: 33.3333%;
 	}
-	.flex-control-thumbs li:nth-child(3n+1) {
-		clear: left;
-	}
 }
 
 .woocommerce-product-gallery--columns-4 {
 	.flex-control-thumbs li {
 		width: 25%;
 	}
-	.flex-control-thumbs li:nth-child(4n+1) {
-		clear: left;
-	}
 }
 
 .woocommerce-product-gallery--columns-5 {
 	.flex-control-thumbs li {
 		width: 20%;
-	}
-	.flex-control-thumbs li:nth-child(5n+1) {
-		clear: left;
 	}
 }
 
@@ -539,26 +545,6 @@ table.variations {
 			}
 		}
 	}
-}
-
-/**
- * Photoswipe
- * 1. These styles are required to overwrite default theme button styles (Twenty Twelve adds gradients via background-image).
- */
-
-button.pswp__button,
-button.pswp__button:hover,
-button.pswp__button--arrow--left::before,
-button.pswp__button--arrow--right::before {
-	background-color: transparent !important; /* 1 */
-}
-
-button.pswp__button--close:hover {
-	background-position: 0 -44px;
-}
-
-button.pswp__button--zoom:hover {
-	background-position: -88px 0;
 }
 
 /**
@@ -800,23 +786,6 @@ button.pswp__button--zoom:hover {
 	}
 }
 
-#shipping_method {
-	list-style: none;
-	margin-top: 1em;
-
-	li {
-		margin-bottom: .5em;
-
-		input {
-			float: left;
-		}
-
-		label {
-			line-height: 1.15;
-		}
-	}
-}
-
 .checkout-button {
 	display: block;
 	padding: 1em 2em;
@@ -824,9 +793,11 @@ button.pswp__button--zoom:hover {
 	text-align: center;
 	font-weight: 800;
 	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
 
 	&:hover {
 		box-shadow: none !important;
+		-webkit-box-shadow: none !important;
 		border-color: #999;
 	}
 
@@ -856,7 +827,7 @@ button.pswp__button--zoom:hover {
 				background: #bbb;
 				border-radius: 13em;
 				box-sizing: content-box;
-				transition: all ease-in-out .3s;
+				@include transition(all,ease-in-out,.3s);
 				position: absolute;
 				top: 4px;
 				right: 0;
@@ -872,7 +843,7 @@ button.pswp__button--zoom:hover {
 				top: 7px;
 				right: 17px;
 				border-radius: 13em;
-				transition: all ease-in-out .3s;
+				@include transition(all,ease-in-out,.3s);
 			}
 		}
 
@@ -891,16 +862,11 @@ button.pswp__button--zoom:hover {
 	}
 }
 
-.woocommerce-terms-and-conditions {
-	border: 1px solid rgba(0,0,0,.2);
-	box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-	background: rgba(0,0,0,.05);
-}
-
 .woocommerce-checkout {
 	.select2-choice,
 	.select2-choice:hover {
 		box-shadow: none !important;
+		-webkit-box-shadow: none !important;
 	}
 
 	.select2-choice {
@@ -967,7 +933,7 @@ button.pswp__button--zoom:hover {
 		cursor: pointer;
 	}
 
-	input.input-radio[name=payment_method] {
+	input[type=radio] {
 		display: none;
 
 		& + label {
@@ -982,57 +948,13 @@ button.pswp__button--zoom:hover {
 				margin-left: 4px;
 				margin-right: .5em;
 				border-radius: 100%;
-				transform: translateY(2px);
+				@include transform(translateY(2px));
 			}
 		}
 
 		&:checked + label {
 			&:before {
 				background: black;
-			}
-		}
-	}
-}
-
-.colors-dark {
-	.page-numbers {
-		color: #444;
-
-		&.next, &.prev {
-			color: #ddd;
-		}
-	}
-
-	.checkout-button {
-		border: 2px solid #555;
-
-		&:hover {
-			border-color: #fff;
-		}
-	}
-
-	.wc_payment_method {
-		.payment_box {
-			background: #333;
-		}
-	}
-
-	.select2-container--default {
-		.select2-results {
-			.select2-results__options {
-				background:#333;
-			}
-			.select2-results__option[aria-selected="true"]{
-				color: #333;
-			}
-		}
-
-		.select2-selection--single {
-			background-color: #333;
-			border: 1px solid #555;
-
-			.select2-selection__rendered {
-				color: #ccc;
 			}
 		}
 	}

@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WC_Validation {
 
 	/**
-	 * Validates an email using WordPress native is_email function.
+	 * Validates an email using wordpress native is_email function.
 	 *
-	 * @param   string	$email Email address to validate.
+	 * @param   string	email address
 	 * @return  bool
 	 */
 	public static function is_email( $email ) {
@@ -28,11 +28,11 @@ class WC_Validation {
 	/**
 	 * Validates a phone number using a regular expression.
 	 *
-	 * @param   string	$phone Phone number to validate.
+	 * @param   string	phone number
 	 * @return  bool
 	 */
 	public static function is_phone( $phone ) {
-		if ( 0 < strlen( trim( preg_replace( '/[\s\#0-9_\-\+\/\(\)]/', '', $phone ) ) ) ) {
+		if ( 0 < strlen( trim( preg_replace( '/[\s\#0-9_\-\+\(\)]/', '', $phone ) ) ) ) {
 			return false;
 		}
 
@@ -42,8 +42,8 @@ class WC_Validation {
 	/**
 	 * Checks for a valid postcode.
 	 *
-	 * @param   string	$postcode Postcode to validate.
-	 * @param	string	$country Country to validate the postcode for.
+	 * @param   string	postcode
+	 * @param	string	country
 	 * @return  bool
 	 */
 	public static function is_postcode( $postcode, $country ) {
@@ -65,7 +65,6 @@ class WC_Validation {
 				$valid = (bool) preg_match( '/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/', $postcode );
 				break;
 			case 'ES' :
-			case 'FR' :
 				$valid = (bool) preg_match( '/^([0-9]{5})$/i', $postcode );
 				break;
 			case 'GB' :
@@ -83,9 +82,6 @@ class WC_Validation {
 			case 'CA' :
 				// CA Postal codes cannot contain D,F,I,O,Q,U and cannot start with W or Z. https://en.wikipedia.org/wiki/Postal_codes_in_Canada#Number_of_possible_postal_codes
 				$valid = (bool) preg_match( '/^([ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ])([\ ])?(\d[ABCEGHJKLMNPRSTVWXYZ]\d)$/i', $postcode );
-				break;
-			case 'PL':
-				$valid = (bool) preg_match( '/^([0-9]{2})([-])([0-9]{3})$/', $postcode );
 				break;
 
 			default :
@@ -116,16 +112,16 @@ class WC_Validation {
 		$pcexp = array();
 
 		// Expression for postcodes: AN NAA, ANN NAA, AAN NAA, and AANN NAA
-		$pcexp[0] = '/^(' . $alpha1 . '{1}' . $alpha2 . '{0,1}[0-9]{1,2})([0-9]{1}' . $alpha5 . '{2})$/';
+		$pcexp[0] = '/^('.$alpha1.'{1}'.$alpha2.'{0,1}[0-9]{1,2})([0-9]{1}'.$alpha5.'{2})$/';
 
 		// Expression for postcodes: ANA NAA
-		$pcexp[1] = '/^(' . $alpha1 . '{1}[0-9]{1}' . $alpha3 . '{1})([0-9]{1}' . $alpha5 . '{2})$/';
+		$pcexp[1] =  '/^('.$alpha1.'{1}[0-9]{1}'.$alpha3.'{1})([0-9]{1}'.$alpha5.'{2})$/';
 
 		// Expression for postcodes: AANA NAA
-		$pcexp[2] = '/^(' . $alpha1 . '{1}' . $alpha2 . '[0-9]{1}' . $alpha4 . ')([0-9]{1}' . $alpha5 . '{2})$/';
+		$pcexp[2] =  '/^('.$alpha1.'{1}'.$alpha2.'[0-9]{1}'.$alpha4.')([0-9]{1}'.$alpha5.'{2})$/';
 
 		// Exception for the special postcode GIR 0AA
-		$pcexp[3] = '/^(gir)(0aa)$/';
+		$pcexp[3] =  '/^(gir)(0aa)$/';
 
 		// Standard BFPO numbers
 		$pcexp[4] = '/^(bfpo)([0-9]{1,4})$/';
@@ -155,9 +151,9 @@ class WC_Validation {
 	/**
 	 * Format the postcode according to the country and length of the postcode.
 	 *
-	 * @param   string	$postcode Postcode to format.
-	 * @param	string	$country Country to format the postcode for.
-	 * @return  string	Formatted postcode.
+	 * @param   string	postcode
+	 * @param	string	country
+	 * @return  string	formatted postcode
 	 */
 	public static function format_postcode( $postcode, $country ) {
 		return wc_format_postcode( $postcode, $country );
@@ -166,7 +162,8 @@ class WC_Validation {
 	/**
 	 * format_phone function.
 	 *
-	 * @param mixed $tel Phone number to format.
+	 * @access public
+	 * @param mixed $tel
 	 * @return string
 	 */
 	public static function format_phone( $tel ) {

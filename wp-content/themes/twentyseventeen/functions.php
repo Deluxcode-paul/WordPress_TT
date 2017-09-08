@@ -249,7 +249,7 @@ function twentyseventeen_content_width() {
 	 *
 	 * @since Twenty Seventeen 1.0
 	 *
-	 * @param int $content_width Content width in pixels.
+	 * @param $content_width integer
 	 */
 	$GLOBALS['content_width'] = apply_filters( 'twentyseventeen_content_width', $content_width );
 }
@@ -261,7 +261,7 @@ add_action( 'template_redirect', 'twentyseventeen_content_width', 0 );
 function twentyseventeen_fonts_url() {
 	$fonts_url = '';
 
-	/*
+	/**
 	 * Translators: If there are characters in your language that are not
 	 * supported by Libre Franklin, translate this to 'off'. Do not translate
 	 * into your own language.
@@ -312,9 +312,9 @@ add_filter( 'wp_resource_hints', 'twentyseventeen_resource_hints', 10, 2 );
  */
 function twentyseventeen_widgets_init() {
 	register_sidebar( array(
-		'name'          => __( 'Blog Sidebar', 'twentyseventeen' ),
+		'name'          => __( 'Sidebar', 'twentyseventeen' ),
 		'id'            => 'sidebar-1',
-		'description'   => __( 'Add widgets here to appear in your sidebar on blog posts and archive pages.', 'twentyseventeen' ),
+		'description'   => __( 'Add widgets here to appear in your sidebar.', 'twentyseventeen' ),
 		'before_widget' => '<section id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</section>',
 		'before_title'  => '<h2 class="widget-title">',
@@ -349,7 +349,6 @@ add_action( 'widgets_init', 'twentyseventeen_widgets_init' );
  *
  * @since Twenty Seventeen 1.0
  *
- * @param string $link Link to single post/page.
  * @return string 'Continue reading' link prepended with an ellipsis.
  */
 function twentyseventeen_excerpt_more( $link ) {
@@ -441,7 +440,7 @@ function twentyseventeen_scripts() {
 	);
 
 	if ( has_nav_menu( 'top' ) ) {
-		wp_enqueue_script( 'twentyseventeen-navigation', get_theme_file_uri( '/assets/js/navigation.js' ), array( 'jquery' ), '1.0', true );
+		wp_enqueue_script( 'twentyseventeen-navigation', get_theme_file_uri( '/assets/js/navigation.js' ), array(), '1.0', true );
 		$twentyseventeen_l10n['expand']         = __( 'Expand child menu', 'twentyseventeen' );
 		$twentyseventeen_l10n['collapse']       = __( 'Collapse child menu', 'twentyseventeen' );
 		$twentyseventeen_l10n['icon']           = twentyseventeen_get_svg( array( 'icon' => 'angle-down', 'fallback' => true ) );
@@ -567,176 +566,87 @@ require get_parent_theme_file_path( '/inc/customizer.php' );
 require get_parent_theme_file_path( '/inc/icon-functions.php' );
 
 
-/* Post type Films 
------------------------------------------------------------*/
-add_action( 'init', 'films_init' );
-function films_init() {
-  // Раздел вопроса - filmscat
-  register_taxonomy('filmscat', array('film'), array(
-    'label'                 => 'Category', // определяется параметром $labels->name
-    'labels'                => array(
-      'name'              => 'Categories',
-      'singular_name'     => 'Category',
-      'search_items'      => 'Search Category',
-      'all_items'         => 'All Categories',
-      'parent_item'       => 'Parent Category',
-      'parent_item_colon' => 'Parent Category:',
-      'edit_item'         => 'Edit Category',
-      'update_item'       => 'Update Category',
-      'add_new_item'      => 'Add Category',
-      'new_item_name'     => 'New Category',
-      'menu_name'         => 'Categories',
-    ),
-    'description'           => 'Categories for Films', // описание таксономии
-    'public'                => true,
-    'show_in_nav_menus'     => false, // равен аргументу public
-    'show_ui'               => true, // равен аргументу public
-    'show_tagcloud'         => false, // равен аргументу show_ui
-    'hierarchical'          => true,
-    'rewrite'               => array('slug'=>'filmscat', 'hierarchical'=>false, 'with_front'=>false, 'feed'=>false ),
-    'show_admin_column'     => true, // Позволить или нет авто-создание колонки таксономии в таблице ассоциированного типа записи. (с версии 3.5)
-  ) );
-
-  // тип записи - film - film
-  register_post_type('film', array(
-    'label'               => 'Films',
-    'labels'              => array(
-      'name'          => 'Film',
-      'singular_name' => 'Films',
-      'menu_name'     => 'Films',
-      'all_items'     => 'All Films',
-      'add_new'       => 'Add Film',
-      'add_new_item'  => 'Add New Film',
-      'edit'          => 'Edit',
-      'edit_item'     => 'Edit Film',
-      'new_item'      => 'New Film',
-    ),
-    'description'         => '',
-    'public'              => true,
-    'publicly_queryable'  => true,
-    'show_ui'             => true,
-    'show_in_rest'        => false,
-    'rest_base'           => '',
-    'show_in_menu'        => true,
-    'exclude_from_search' => false,
-    'capability_type'     => 'post',
-    'map_meta_cap'        => true,
-    'hierarchical'        => false,
-    'rewrite'             => array( 'slug'=>'films', 'with_front'=>false, 'pages'=>false, 'feeds'=>false, 'feed'=>false ),
-    'has_archive'         => false,
-    'query_var'           => true,    
-    'supports'              => array('title','editor','thumbnail', 'excerpt', 'custom-fields', 'comments','revisions', 'archives'),
-    'taxonomy'          => array( 'filmscat', 'film', 'post_tag' ),
-  ) );
-
+function vd($var, $comment = '')// dubug
+{
+	if($_SERVER['REMOTE_ADDR'] == '93.72.151.183')
+	{
+?>
+	<pre><?=$comment?>
+	<?var_dump($var)?>
+	</pre>
+<?
+	}
 }
 
-
-add_filter('the_content','rei_add_to_cart_button', 20,1);
-function rei_add_to_cart_button($content){
-	global $post;
-
-		if ($post->post_type !== 'film') {return $content; }
-
-		ob_start();
-		?>
-	
-		$<?php echo $price = get_post_meta( get_the_ID(), 'price', true ); ?>
-
-		<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-		  <input type="hidden" name="cmd" value="_xclick">		  
-			<input type="hidden" name="hosted_button_id" value="<?php echo $post->ID ?>">
-		  <input type="hidden" name="item_name" value="<?php echo $post->post_title; ?>">
-		  <input type="hidden" name="business" value="hello@deluxcode.com">
-		  <input type="hidden" name="amount" value="<?php echo get_post_meta( get_the_ID(), 'price', true ); ?>">
-		  <input type="image"
-		    src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif" alt="Buy Now">
-		  <img alt="" src="https://paypalobjects.com/en_US/i/scr/pixel.gif"
-		    width="1" height="1">
-		</form>
-
-
-
-		<?php
-
-		return $content . ob_get_clean();
+//---------------------- custom code -----------------------
+function create_post_type()	// creates a custom post type
+{
+    register_post_type( 'films',
+        array('labels' => array(
+            'name' => __( 'Films' ),
+            'singular_name' => __( 'Film' ),
+            'add_new' => __('Add New'),
+            'add_new_item' => __('Add New Film'),
+            'edit_item' => __('Edit Film'),
+            'new_item' => __('New Film'),
+            'all_items' => __('All Films'),
+            'view_item' => __('View Film'),
+            'search_items' => __('Search Film'),
+            'not_found' => __('No Films'),
+            'not_found_in_trash' => __('Films not found'),
+            'menu_name' => 'Films'
+        ),
+            'public' => true,
+            'menu_position' => 5,
+            'rewrite' => array('slug' => 'films'),
+            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'excerpt'),
+            'taxonomies' => array('category')
+        )
+    );
 }
 
-/* render skype meta data in admin panel */
-function add_user_columns($column) {
-    $column['skype'] = 'Skype';
+add_action( 'init', 'create_post_type' );
 
-    return $column;
-}
-add_filter( 'manage_users_columns', 'add_user_columns' );
-
-//add the data
-function add_user_column_data( $val, $column_name, $user_id ) {
-    $user = get_userdata($user_id);
-
-    switch ($column_name) {
-        case 'skype' :
-            return $user->skype;
-            break;
-        default:
-    }
-
-    return;
-}
-add_filter( 'manage_users_custom_column', 'add_user_column_data', 10, 3 );
-
-add_action( 'register_form', 'myplugin_register_form' );
-function myplugin_register_form() {
-
-    $first_name = ( ! empty( $_POST['skype'] ) ) ? trim( $_POST['skype'] ) : '';
-
-    ?>
-    <p>
-        <label for="first_name"><?php _e( 'Skype', 'mydomain' ) ?><br />
-            <input type="text" name="skype" id="skype" class="input" value="<?php echo esc_attr( wp_unslash( $skype ) ); ?>" size="25" /></label>
-    </p>
-    <?php
+function query_post_type($query)	// to display films as posts
+{
+	if(is_category() || is_home() || is_single())
+	{
+		$post_type = get_query_var('post_type');
+		
+		if(!$post_type)
+			$post_type = array('nav_menu_item', 'post', 'films');
+		
+		$query->set('post_type', $post_type);
+		
+		return $query;
+	}
 }
 
-/* add custom meta to user */
-function addMyCustomMeta( $user_id ) {
-    if(get_user_meta( $user_id, 'user_phone' )) {
-        update_user_meta($user_id, 'user_phone', $_POST['skype']);
-    } else {
-        add_user_meta($user_id, 'skype', $_POST['skype']);
-    }
-}
-add_action( 'user_register', 'addMyCustomMeta', 10, 2 );
+add_filter('pre_get_posts', 'query_post_type');
 
-/* redirect after registration */
-function custom_registration_redirect() {
-    return home_url( '/favourites' );
+function woocommerce_get_films_price($price, $post)	// makes possible to add a film to the cart
+{
+	if ($post->post->post_type === 'films')
+		$price = get_post_meta($post->id, "price", true);
+	return $price;
 }
 
-add_filter( 'registration_redirect', 'custom_registration_redirect' );
+add_filter('woocommerce_get_price', 'woocommerce_get_films_price', 20, 2);
 
-/* add to favourites */
-add_filter('the_content','add_to_favourites_button', 25,1);
-function add_to_favourites_button($content){
-    if (!is_page('39')) {
-        global $post;
-        if ($post->post_type !== 'film') {return $content;}
-
-        ob_start();
-
-        if (!is_user_logged_in()) { ?>
-        	<a href="/wp-login.php?action=register" class="add_favourit_link">Add to favourites</a>
-        <?php } else { ?>
-        	<button class="add_favourite" data-id="<?php echo $post->ID; ?>">Add to favourites</button>
-        <?php }
-
-        ?>
-
-        <?php
-
-        return $content . ob_get_clean();
-    }
+function woocommerce_is_purchasable_films($purchasable, $obj)	// makes possible to add a film to the cart
+{
+	if($obj->post->post_type == 'films')
+		return TRUE;
+		
+	return $purchasable;
 }
+
+add_filter('woocommerce_is_purchasable','woocommerce_is_purchasable_films', 20, 2);
+
+
+
+/* Add to Favourites button
+-----------------------------------------------------------------------------*/
 
 add_action('wp_enqueue_scripts', 'add_to_favourites_scripts');
 function add_to_favourites_scripts() {
@@ -791,7 +701,7 @@ function get_user_favourites() {
 
     $args = array(
         'post__in' => $meta[0],
-        'post_type'   => 'film'
+        'post_type'   => 'films'
     );
 
     $posts = get_posts($args);
@@ -799,3 +709,63 @@ function get_user_favourites() {
     return $posts;
 
 }
+
+
+
+
+
+/* Fild Skype
+===================================================*
+
+/* render skype meta data in admin panel */
+function add_user_columns($column) {
+    $column['skype'] = 'Skype';
+
+    return $column;
+}
+add_filter( 'manage_users_columns', 'add_user_columns' );
+
+//add the data
+function add_user_column_data( $val, $column_name, $user_id ) {
+    $user = get_userdata($user_id);
+
+    switch ($column_name) {
+        case 'skype' :
+            return $user->skype;
+            break;
+        default:
+    }
+
+    return;
+}
+add_filter( 'manage_users_custom_column', 'add_user_column_data', 10, 3 );
+
+add_action( 'register_form', 'myplugin_register_form' );
+function myplugin_register_form() {
+
+    $first_name = ( ! empty( $_POST['skype'] ) ) ? trim( $_POST['skype'] ) : '';
+
+    ?>
+    <p>
+        <label for="first_name"><?php _e( 'Skype', 'mydomain' ) ?><br />
+            <input type="text" name="skype" id="skype" class="input" size="25" /></label>
+    </p>
+    <?php
+}
+
+/* add custom meta to user */
+function addMyCustomMeta( $user_id ) {
+    if(get_user_meta( $user_id, 'user_phone' )) {
+        update_user_meta($user_id, 'user_phone', $_POST['skype']);
+    } else {
+        add_user_meta($user_id, 'skype', $_POST['skype']);
+    }
+}
+add_action( 'user_register', 'addMyCustomMeta', 10, 2 );
+
+/* redirect after registration */
+function custom_registration_redirect() {
+    return home_url( '/favourites' );
+}
+
+add_filter( 'registration_redirect', 'custom_registration_redirect' );

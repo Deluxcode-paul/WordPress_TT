@@ -235,10 +235,7 @@ function wp_print_media_templates() {
 
 				<# if ( data.suggestedWidth && data.suggestedHeight ) { #>
 					<p class="suggested-dimensions">
-						<?php
-							/* translators: 1: suggested width number, 2: suggested height number. */
-							printf( __( 'Suggested image dimensions: %1$s by %2$s pixels.' ), '{{data.suggestedWidth}}', '{{data.suggestedHeight}}' );
-						?>
+						<?php _e( 'Suggested image dimensions:' ); ?> {{data.suggestedWidth}} &times; {{data.suggestedHeight}}
 					</p>
 				<# } #>
 
@@ -475,7 +472,7 @@ function wp_print_media_templates() {
 			<# } #>
 		</div>
 		<# if ( data.buttons.check ) { #>
-			<button type="button" class="check" tabindex="-1"><span class="media-modal-icon"></span><span class="screen-reader-text"><?php _e( 'Deselect' ); ?></span></button>
+			<button type="button" class="button-link check" tabindex="-1"><span class="media-modal-icon"></span><span class="screen-reader-text"><?php _e( 'Deselect' ); ?></span></button>
 		<# } #>
 		<#
 		var maybeReadOnly = data.can.save || data.allowLocalEdits ? '' : 'readonly';
@@ -608,7 +605,7 @@ function wp_print_media_templates() {
 		<h2><?php _e( 'Attachment Display Settings' ); ?></h2>
 
 		<# if ( 'image' === data.type ) { #>
-			<label class="setting align">
+			<label class="setting">
 				<span><?php _e('Alignment'); ?></span>
 				<select class="alignment"
 					data-setting="align"
@@ -764,7 +761,7 @@ function wp_print_media_templates() {
 				<# } #>
 				>
 				<?php
-				/** This filter is documented in wp-admin/includes/media.php */
+				// This filter is documented in wp-admin/includes/media.php
 				$size_names = apply_filters( 'image_size_names_choose', array(
 					'thumbnail' => __( 'Thumbnail' ),
 					'medium'    => __( 'Medium' ),
@@ -1087,7 +1084,7 @@ function wp_print_media_templates() {
 					</div>
 				</div>
 
-				<label class="setting checkbox-setting autoplay">
+				<label class="setting checkbox-setting">
 					<input type="checkbox" data-setting="autoplay" />
 					<span><?php _e( 'Autoplay' ); ?></span>
 				</label>
@@ -1176,7 +1173,7 @@ function wp_print_media_templates() {
 					</div>
 				</div>
 
-				<label class="setting checkbox-setting autoplay">
+				<label class="setting checkbox-setting">
 					<input type="checkbox" data-setting="autoplay" />
 					<span><?php _e( 'Autoplay' ); ?></span>
 				</label>

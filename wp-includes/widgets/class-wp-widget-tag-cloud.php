@@ -53,8 +53,6 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 			}
 		}
 
-		$show_count = ! empty( $instance['count'] );
-
 		/**
 		 * Filters the taxonomy used in the Tag Cloud widget.
 		 *
@@ -66,9 +64,8 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 		 * @param array $args Args used for the tag cloud widget.
 		 */
 		$tag_cloud = wp_tag_cloud( apply_filters( 'widget_tag_cloud_args', array(
-			'taxonomy'   => $current_taxonomy,
-			'echo'       => false,
-			'show_count' => $show_count,
+			'taxonomy' => $current_taxonomy,
+			'echo' => false
 		) ) );
 
 		if ( empty( $tag_cloud ) ) {
@@ -105,7 +102,6 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 		$instance = array();
 		$instance['title'] = sanitize_text_field( $new_instance['title'] );
-		$instance['count'] = ! empty( $new_instance['count'] ) ? 1 : 0;
 		$instance['taxonomy'] = stripslashes($new_instance['taxonomy']);
 		return $instance;
 	}
@@ -121,7 +117,6 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 	public function form( $instance ) {
 		$current_taxonomy = $this->_get_current_taxonomy($instance);
 		$title_id = $this->get_field_id( 'title' );
-		$count = isset( $instance['count'] ) ? (bool) $instance['count'] : false;
 		$instance['title'] = ! empty( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 
 		echo '<p><label for="' . $title_id .'">' . __( 'Title:' ) . '</label>
@@ -133,14 +128,6 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 		$name = $this->get_field_name( 'taxonomy' );
 		$input = '<input type="hidden" id="' . $id . '" name="' . $name . '" value="%s" />';
 
-		$count_checkbox = sprintf(
-			'<p><input type="checkbox" class="checkbox" id="%1$s" name="%2$s"%3$s /> <label for="%1$s">%4$s</label></p>',
-			$this->get_field_id( 'count' ),
-			$this->get_field_name( 'count' ),
-			checked( $count, true, false ),
-			__( 'Show tag counts' )
-		);
-
 		switch ( count( $taxonomies ) ) {
 
 		// No tag cloud supporting taxonomies found, display error message
@@ -149,15 +136,14 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 			printf( $input, '' );
 			break;
 
-		// Just a single tag cloud supporting taxonomy found, no need to display a select.
+		// Just a single tag cloud supporting taxonomy found, no need to display options
 		case 1:
 			$keys = array_keys( $taxonomies );
 			$taxonomy = reset( $keys );
 			printf( $input, esc_attr( $taxonomy ) );
-			echo $count_checkbox;
 			break;
 
-		// More than one tag cloud supporting taxonomy found, display a select.
+		// More than one tag cloud supporting taxonomy found, display options
 		default:
 			printf(
 				'<p><label for="%1$s">%2$s</label>' .
@@ -176,7 +162,7 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 				);
 			}
 
-			echo '</select></p>' . $count_checkbox;
+			echo '</select></p>';
 		}
 	}
 

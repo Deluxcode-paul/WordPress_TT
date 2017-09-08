@@ -23,7 +23,7 @@
 	?>
 	<header class="entry-header">
 		<?php
-		if ( 'film' === get_post_type() ) {
+		if ( 'films' === get_post_type() ) {
 			echo '<div class="entry-meta">';
 				if ( is_single() ) {
 					twentyseventeen_posted_on();
@@ -45,20 +45,6 @@
 
 		<?php echo get_post_meta( get_the_ID(), 'sub-title', true ); ?> <br/>
 
-		<?php 
-			$categories = get_terms( array( 
-			    'taxonomies' => 'filmscat'
-			) );
-
-			$cats = '';
-
-			foreach ($categories as $cat) {
-				$cats .= "<a href='" . get_category_link($cat) ."'>" . $cat->name . "</a>";
-			}
-
-			echo 'Category: ' . $cats;
-		?>
-
 
 	</header><!-- .entry-header -->
 
@@ -70,15 +56,33 @@
 		</div><!-- .post-thumbnail -->
 	<?php endif; ?>
 
+    <p class="categories">
+        <?php
+        $categories = get_the_category();
+
+        $cats = '';
+
+        foreach ($categories as $cat) {
+            $cats .= "<a href='" . get_category_link($cat) ."'>" . $cat->name . " </a>";
+        }
+
+        echo 'Category: ' . $cats;
+        ?>
+    </p>
+
 	<div class="content">
 		<?php
 		/* translators: %s: Name of current post */
 		the_excerpt( sprintf(
 			__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
 			get_the_title()
-		) );
+		) ); ?>
 
-		wp_link_pages( array(
+        <p><?php echo wc_price(get_post_meta($post->ID, "price", true))?></p>
+        <a class="add_to_cart_film" href="/wp-content/themes/twentyseventeen/add_to_cart_film.php?film=<?=$post->ID?>">Buy</a>
+
+		<?php
+        wp_link_pages( array(
 			'before'      => '<div class="page-links">' . __( 'Pages:', 'twentyseventeen' ),
 			'after'       => '</div>',
 			'link_before' => '<span class="page-number">',
@@ -88,7 +92,7 @@
 	</div><!-- .entry-content -->
 
 
-		<?php echo rei_add_to_cart_button();?>
+		<?php //echo rei_add_to_cart_button();?>
 
 	<?php
 	if ( is_single() ) {

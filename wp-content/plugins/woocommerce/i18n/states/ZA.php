@@ -9,10 +9,6 @@
  */
 global $states;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 $states['ZA'] = array(
 	'EC'  => __( 'Eastern Cape', 'woocommerce' ),
 	'FS'  => __( 'Free State', 'woocommerce' ),
@@ -22,5 +18,5 @@ $states['ZA'] = array(
 	'MP'  => __( 'Mpumalanga', 'woocommerce' ),
 	'NC'  => __( 'Northern Cape', 'woocommerce' ),
 	'NW'  => __( 'North West', 'woocommerce' ),
-	'WC'  => __( 'Western Cape', 'woocommerce' ),
+	'WC'  => __( 'Western Cape', 'woocommerce' )
 );

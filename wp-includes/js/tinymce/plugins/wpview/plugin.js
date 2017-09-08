@@ -92,7 +92,13 @@
 		} );
 
 		// Replace any new markers nodes with views.
-		editor.on( 'setcontent', function() {
+		editor.on( 'setcontent', function( event ) {
+			if ( event.load && ! event.initial && editor.quirks.refreshContentEditable ) {
+				// Make sure there is a selection in Gecko browsers.
+				// Or it will refresh the content internally which resets the iframes.
+				editor.quirks.refreshContentEditable();
+			}
+
 			wp.mce.views.render();
 		} );
 
@@ -184,7 +190,7 @@
 				] );
 
 				editor.on( 'wptoolbar', function( event ) {
-					if ( ! event.collapsed && isView( event.element ) ) {
+					if ( isView( event.element ) ) {
 						event.toolbar = toolbar;
 					}
 				} );

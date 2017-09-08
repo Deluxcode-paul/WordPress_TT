@@ -41,8 +41,7 @@ wpWidgets = {
 		$(document.body).bind('click.widgets-toggle', function(e) {
 			var target = $(e.target),
 				css = { 'z-index': 100 },
-				widget, inside, targetWidth, widgetWidth, margin,
-				toggleBtn = target.closest( '.widget' ).find( '.widget-top button.widget-action' );
+				widget, inside, targetWidth, widgetWidth, margin;
 
 			if ( target.parents('.widget-top').length && ! target.parents('#available-widgets').length ) {
 				widget = target.closest('div.widget');
@@ -61,21 +60,10 @@ wpWidgets = {
 						css[ margin ] = widgetWidth - ( targetWidth + 30 ) + 'px';
 						widget.css( css );
 					}
-					/*
-					 * Don't change the order of attributes changes and animation:
-					 * it's important for screen readers, see ticket #31476.
-					 */
-					toggleBtn.attr( 'aria-expanded', 'true' );
-					inside.slideDown( 'fast', function() {
-						widget.addClass( 'open' );
-					});
+					widget.addClass( 'open' );
+					inside.slideDown('fast');
 				} else {
-					/*
-					 * Don't change the order of attributes changes and animation:
-					 * it's important for screen readers, see ticket #31476.
-					 */
-					toggleBtn.attr( 'aria-expanded', 'false' );
-					inside.slideUp( 'fast', function() {
+					inside.slideUp('fast', function() {
 						widget.attr( 'style', '' );
 						widget.removeClass( 'open' );
 					});
@@ -90,7 +78,6 @@ wpWidgets = {
 			} else if ( target.hasClass('widget-control-close') ) {
 				widget = target.closest('div.widget');
 				widget.removeClass( 'open' );
-				toggleBtn.attr( 'aria-expanded', 'false' );
 				wpWidgets.close( widget );
 				e.preventDefault();
 			} else if ( target.attr( 'id' ) === 'inactive-widgets-control-remove' ) {
@@ -105,7 +92,7 @@ wpWidgets = {
 			wpWidgets.appendTitle( this );
 
 			if ( $this.find( 'p.widget-error' ).length ) {
-				$this.find( '.widget-action' ).trigger( 'click' ).attr( 'aria-expanded', 'true' );
+				$this.find( 'a.widget-action' ).trigger('click');
 			}
 		});
 
@@ -195,7 +182,6 @@ wpWidgets = {
 
 				if ( inside.css('display') === 'block' ) {
 					ui.item.removeClass('open');
-					ui.item.find( '.widget-top button.widget-action' ).attr( 'aria-expanded', 'false' );
 					inside.hide();
 					$(this).sortable('refreshPositions');
 				}
@@ -268,7 +254,7 @@ wpWidgets = {
 				}
 
 				if ( addNew ) {
-					$widget.find( '.widget-action' ).trigger( 'click' );
+					$widget.find( 'a.widget-action' ).trigger('click');
 				} else {
 					wpWidgets.saveOrder( $sidebar.attr('id') );
 				}
@@ -506,10 +492,7 @@ wpWidgets = {
 
 	close : function(widget) {
 		widget.children('.widget-inside').slideUp('fast', function() {
-			widget.attr( 'style', '' )
-				.find( '.widget-top button.widget-action' )
-					.attr( 'aria-expanded', 'false' )
-					.focus();
+			widget.attr( 'style', '' );
 		});
 	},
 

@@ -476,8 +476,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 			 *
 			 * @param string $post_type The post type slug.
 			 * @param string $which     The location of the extra table nav markup:
-			 *                          'top' or 'bottom' for WP_Posts_List_Table,
-			 *                          'bar' for WP_Media_List_Table.
+			 *                          'top' or 'bottom'.
 			 */
 			do_action( 'restrict_manage_posts', $this->screen->post_type, $which );
 
@@ -489,7 +488,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 			}
 		}
 
-		if ( $this->is_trash && current_user_can( get_post_type_object( $this->screen->post_type )->cap->edit_others_posts ) && $this->has_items() ) {
+		if ( $this->is_trash && current_user_can( get_post_type_object( $this->screen->post_type )->cap->edit_others_posts ) ) {
 			submit_button( __( 'Empty Trash' ), 'apply', 'delete_all', false );
 		}
 ?>
@@ -871,7 +870,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 	 * @since 4.3.0
 	 * @access public
 	 *
-	 * @global string $mode List table view mode.
+	 * @global string $mode
 	 *
 	 * @param WP_Post $post The current WP_Post object.
 	 */
@@ -968,7 +967,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 	 * @since 4.3.0
 	 * @access public
 	 *
-	 * @global string $mode List table view mode.
+	 * @global string $mode
 	 *
 	 * @param WP_Post $post The current WP_Post object.
 	 */
@@ -993,33 +992,17 @@ class WP_Posts_List_Table extends WP_List_Table {
 		}
 
 		if ( 'publish' === $post->post_status ) {
-			$status = __( 'Published' );
+			_e( 'Published' );
 		} elseif ( 'future' === $post->post_status ) {
 			if ( $time_diff > 0 ) {
-				$status = '<strong class="error-message">' . __( 'Missed schedule' ) . '</strong>';
+				echo '<strong class="error-message">' . __( 'Missed schedule' ) . '</strong>';
 			} else {
-				$status = __( 'Scheduled' );
+				_e( 'Scheduled' );
 			}
 		} else {
-			$status = __( 'Last Modified' );
+			_e( 'Last Modified' );
 		}
-
-		/**
-		 * Filters the status text of the post.
-		 *
-		 * @since 4.8.0
-		 *
-		 * @param string  $status      The status text.
-		 * @param WP_Post $post        Post object.
-		 * @param string  $column_name The column name.
-		 * @param string  $mode        The list display mode ('excerpt' or 'list').
-		 */
-		$status = apply_filters( 'post_date_column_status', $status, $post, 'date', $mode );
-
-		if ( $status ) {
-			echo $status . '<br />';
-		}
-
+		echo '<br />';
 		if ( 'excerpt' === $mode ) {
 			/**
 			 * Filters the published time of the post.
@@ -1288,7 +1271,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 				if ( $can_edit_post ) {
 					$preview_link = get_preview_post_link( $post );
 					$actions['view'] = sprintf(
-						'<a href="%s" rel="bookmark" aria-label="%s">%s</a>',
+						'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 						esc_url( $preview_link ),
 						/* translators: %s: post title */
 						esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $title ) ),
@@ -1297,7 +1280,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 				}
 			} elseif ( 'trash' != $post->post_status ) {
 				$actions['view'] = sprintf(
-					'<a href="%s" rel="bookmark" aria-label="%s">%s</a>',
+					'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 					get_permalink( $post->ID ),
 					/* translators: %s: post title */
 					esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $title ) ),
@@ -1346,7 +1329,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @global string $mode List table view mode.
+	 * @global string $mode
 	 */
 	public function inline_edit() {
 		global $mode;
@@ -1437,7 +1420,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 		if ( post_type_supports( $screen->post_type, 'author' ) ) :
 			$authors_dropdown = '';
 
-			if ( current_user_can( $post_type_object->cap->edit_others_posts ) ) :
+			if ( is_super_admin() || current_user_can( $post_type_object->cap->edit_others_posts ) ) :
 				$users_opt = array(
 					'hide_if_only_one_author' => false,
 					'who' => 'authors',

@@ -13,6 +13,7 @@
 	// Link settings
 	api.Widgets.data = _wpCustomizeWidgetsSettings || {};
 	l10n = api.Widgets.data.l10n;
+	delete api.Widgets.data.l10n;
 
 	/**
 	 * wp.customize.Widgets.WidgetModel
@@ -952,7 +953,7 @@
 			var self = this, $removeBtn, replaceDeleteWithRemove;
 
 			// Configure remove button
-			$removeBtn = this.container.find( '.widget-control-remove' );
+			$removeBtn = this.container.find( 'a.widget-control-remove' );
 			$removeBtn.on( 'click', function( e ) {
 				e.preventDefault();
 
@@ -988,7 +989,7 @@
 			} );
 
 			replaceDeleteWithRemove = function() {
-				$removeBtn.text( l10n.removeBtnLabel ); // wp_widget_control() outputs the button as "Delete"
+				$removeBtn.text( l10n.removeBtnLabel ); // wp_widget_control() outputs the link as "Delete"
 				$removeBtn.attr( 'title', l10n.removeBtnTooltip );
 			};
 
@@ -1367,7 +1368,7 @@
 		 * @param {Object} args  merged on top of this.defaultActiveArguments
 		 */
 		onChangeExpanded: function ( expanded, args ) {
-			var self = this, $widget, $inside, complete, prevComplete, expandControl, $toggleBtn;
+			var self = this, $widget, $inside, complete, prevComplete, expandControl;
 
 			self.embedWidgetControl(); // Make sure the outer form is embedded so that the expanded state can be set in the UI.
 			if ( expanded ) {
@@ -1386,7 +1387,6 @@
 
 			$widget = this.container.find( 'div.widget:first' );
 			$inside = $widget.find( '.widget-inside:first' );
-			$toggleBtn = this.container.find( '.widget-top button.widget-action' );
 
 			expandControl = function() {
 
@@ -1400,7 +1400,6 @@
 				complete = function() {
 					self.container.removeClass( 'expanding' );
 					self.container.addClass( 'expanded' );
-					$toggleBtn.attr( 'aria-expanded', 'true' );
 					self.container.trigger( 'expanded' );
 				};
 				if ( args.completeCallback ) {
@@ -1430,10 +1429,10 @@
 					expandControl();
 				}
 			} else {
+
 				complete = function() {
 					self.container.removeClass( 'collapsing' );
 					self.container.removeClass( 'expanded' );
-					$toggleBtn.attr( 'aria-expanded', 'false' );
 					self.container.trigger( 'collapsed' );
 				};
 				if ( args.completeCallback ) {
@@ -1578,86 +1577,36 @@
 			api.Panel.prototype.ready.call( panel );
 
 			panel.deferred.embedded.done(function() {
-				var panelMetaContainer, noticeContainer, updateNotice, getActiveSectionCount, shouldShowNotice;
+				var panelMetaContainer, noRenderedAreasNotice, shouldShowNotice;
 				panelMetaContainer = panel.container.find( '.panel-meta' );
-
-				// @todo This should use the Notifications API introduced to panels. See <https://core.trac.wordpress.org/ticket/38794>.
-				noticeContainer = $( '<div></div>', {
+				noRenderedAreasNotice = $( '<div></div>', {
 					'class': 'no-widget-areas-rendered-notice'
 				});
-				panelMetaContainer.append( noticeContainer );
+				noRenderedAreasNotice.append( $( '<em></em>', {
+					text: l10n.noAreasRendered
+				} ) );
+				panelMetaContainer.append( noRenderedAreasNotice );
 
-				/**
-				 * Get the number of active sections in the panel.
-				 *
-				 * @return {number} Number of active sidebar sections.
-				 */
-				getActiveSectionCount = function() {
-					return _.filter( panel.sections(), function( section ) {
-						return section.active();
-					} ).length;
-				};
-
-				/**
-				 * Determine whether or not the notice should be displayed.
-				 *
-				 * @return {boolean}
-				 */
 				shouldShowNotice = function() {
-					var activeSectionCount = getActiveSectionCount();
-					if ( 0 === activeSectionCount ) {
-						return true;
-					} else {
-						return activeSectionCount !== api.Widgets.data.registeredSidebars.length;
-					}
+					return ( 0 === _.filter( panel.sections(), function( section ) {
+						return section.active();
+					} ).length );
 				};
-
-				/**
-				 * Update the notice.
-				 *
-				 * @returns {void}
-				 */
-				updateNotice = function() {
-					var activeSectionCount = getActiveSectionCount(), someRenderedMessage, nonRenderedAreaCount, registeredAreaCount;
-					noticeContainer.empty();
-
-					registeredAreaCount = api.Widgets.data.registeredSidebars.length;
-					if ( activeSectionCount !== registeredAreaCount ) {
-
-						if ( 0 !== activeSectionCount ) {
-							nonRenderedAreaCount = registeredAreaCount - activeSectionCount;
-							someRenderedMessage = l10n.someAreasShown[ nonRenderedAreaCount ];
-						} else {
-							someRenderedMessage = l10n.noAreasShown;
-						}
-						if ( someRenderedMessage ) {
-							noticeContainer.append( $( '<p></p>', {
-								text: someRenderedMessage
-							} ) );
-						}
-
-						noticeContainer.append( $( '<p></p>', {
-							text: l10n.navigatePreview
-						} ) );
-					}
-				};
-				updateNotice();
 
 				/*
 				 * Set the initial visibility state for rendered notice.
 				 * Update the visibility of the notice whenever a reflow happens.
 				 */
-				noticeContainer.toggle( shouldShowNotice() );
+				noRenderedAreasNotice.toggle( shouldShowNotice() );
 				api.previewer.deferred.active.done( function () {
-					noticeContainer.toggle( shouldShowNotice() );
+					noRenderedAreasNotice.toggle( shouldShowNotice() );
 				});
 				api.bind( 'pane-contents-reflowed', function() {
 					var duration = ( 'resolved' === api.previewer.deferred.active.state() ) ? 'fast' : 0;
-					updateNotice();
 					if ( shouldShowNotice() ) {
-						noticeContainer.slideDown( duration );
+						noRenderedAreasNotice.slideDown( duration );
 					} else {
-						noticeContainer.slideUp( duration );
+						noRenderedAreasNotice.slideUp( duration );
 					}
 				});
 			});

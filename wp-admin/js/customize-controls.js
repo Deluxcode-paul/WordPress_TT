@@ -4420,11 +4420,10 @@
 				function captureSettingModifiedDuringSave( setting ) {
 					modifiedWhileSaving[ setting.id ] = true;
 				}
+				api.bind( 'change', captureSettingModifiedDuringSave );
 
 				submit = function () {
 					var request, query, settingInvalidities = {}, latestRevision = api._latestRevision;
-
-					api.bind( 'change', captureSettingModifiedDuringSave );
 
 					/*
 					 * Block saving if there are any settings that are marked as
@@ -5506,13 +5505,6 @@
 				updateChangesetWithReschedule();
 			} );
 		} ());
-
-		// Make sure TinyMCE dialogs appear above Customizer UI.
-		$( document ).one( 'wp-before-tinymce-init', function() {
-			if ( ! window.tinymce.ui.FloatPanel.zIndex || window.tinymce.ui.FloatPanel.zIndex < 500001 ) {
-				window.tinymce.ui.FloatPanel.zIndex = 500001;
-			}
-		} );
 
 		api.trigger( 'ready' );
 	});

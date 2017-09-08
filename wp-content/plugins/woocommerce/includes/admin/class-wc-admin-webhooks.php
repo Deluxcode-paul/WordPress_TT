@@ -30,10 +30,12 @@ class WC_Admin_Webhooks {
 	 * @return bool
 	 */
 	private function is_webhook_settings_page() {
-		return isset( $_GET['page'], $_GET['tab'], $_GET['section'] )
-			&& 'wc-settings' === $_GET['page']
-			&& 'api' === $_GET['tab']
-			&& 'webhooks' === $_GET['section'];
+		return isset( $_GET['page'] )
+			&& 'wc-settings' == $_GET['page']
+			&& isset( $_GET['tab'] )
+			&& 'api' == $_GET['tab']
+			&& isset( $_GET['section'] )
+			&& 'webhooks' == isset( $_GET['section'] );
 	}
 
 	/**
@@ -44,10 +46,7 @@ class WC_Admin_Webhooks {
 	private function update_name( $webhook_id ) {
 		global $wpdb;
 
-		// @codingStandardsIgnoreStart
-		/* translators: %s: date` */
 		$name = ! empty( $_POST['webhook_name'] ) ? $_POST['webhook_name'] : sprintf( __( 'Webhook created on %s', 'woocommerce' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Webhook created on date parsed by strftime', 'woocommerce' ) ) );
-		// @codingStandardsIgnoreEnd
 		$wpdb->update( $wpdb->posts, array( 'post_title' => $name ), array( 'ID' => $webhook_id ) );
 	}
 
@@ -122,17 +121,6 @@ class WC_Admin_Webhooks {
 	}
 
 	/**
-	 * Update webhook api version.
-	 *
-	 * @param WC_Webhook $webhook Webhook instance.
-	 */
-	private function update_api_version( $webhook ) {
-		$version = ! empty( $_POST['webhook_api_version'] ) ? wc_clean( $_POST['webhook_api_version'] ) : 'wp_api_v2';
-
-		$webhook->set_api_version( $version );
-	}
-
-	/**
 	 * Save method.
 	 */
 	private function save() {
@@ -162,9 +150,6 @@ class WC_Admin_Webhooks {
 
 		// Topic
 		$this->update_topic( $webhook );
-
-		// API version.
-		$this->update_api_version( $webhook );
 
 		// Update date.
 		wp_update_post( array( 'ID' => $webhook->id, 'post_modified' => current_time( 'mysql' ) ) );
@@ -201,7 +186,7 @@ class WC_Admin_Webhooks {
 		}
 
 		if ( ! current_user_can( 'publish_shop_webhooks' ) ) {
-			wp_die( __( 'You do not have permissions to create Webhooks!', 'woocommerce' ) );
+			wp_die( __( 'You don\'t have permissions to create Webhooks!', 'woocommerce' ) );
 		}
 
 		$webhook_id = wp_insert_post( array(
@@ -210,11 +195,8 @@ class WC_Admin_Webhooks {
 			'ping_status'   => 'closed',
 			'post_author'   => get_current_user_id(),
 			'post_password' => strlen( ( $password = uniqid( 'webhook_' ) ) ) > 20 ? substr( $password, 0, 20 ) : $password,
-			// @codingStandardsIgnoreStart
-			/* translators: %s: date */
 			'post_title'    => sprintf( __( 'Webhook created on %s', 'woocommerce' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Webhook created on date parsed by strftime', 'woocommerce' ) ) ),
-			// @codingStandardsIgnoreEnd
-			'comment_status' => 'open',
+			'comment_status' => 'open'
 		) );
 
 		if ( is_wp_error( $webhook_id ) ) {
@@ -222,8 +204,6 @@ class WC_Admin_Webhooks {
 		}
 
 		update_post_meta( $webhook_id, '_webhook_pending_delivery', true );
-		$webhook = new WC_Webhook( $webhook_id );
-		$webhook->set_api_version( 'wp_api_v2' );
 
 		delete_transient( 'woocommerce_webhook_ids' );
 
@@ -286,7 +266,7 @@ class WC_Admin_Webhooks {
 		}
 
 		if ( ! current_user_can( 'edit_shop_webhooks' ) ) {
-			wp_die( __( 'You do not have permissions to edit Webhooks!', 'woocommerce' ) );
+			wp_die( __( 'You don\'t have permissions to edit Webhooks!', 'woocommerce' ) );
 		}
 
 		$webhooks = array_map( 'absint', (array) $_GET['webhook'] );
@@ -315,7 +295,7 @@ class WC_Admin_Webhooks {
 		}
 
 		if ( ! current_user_can( 'delete_shop_webhooks' ) ) {
-			wp_die( __( 'You do not have permissions to delete Webhooks!', 'woocommerce' ) );
+			wp_die( __( 'You don\'t have permissions to delete Webhooks!', 'woocommerce' ) );
 		}
 
 		$webhooks = get_posts( array(
@@ -323,7 +303,7 @@ class WC_Admin_Webhooks {
 			'ignore_sticky_posts' => true,
 			'nopaging'            => true,
 			'post_status'         => 'trash',
-			'fields'              => 'ids',
+			'fields'              => 'ids'
 		) );
 
 		foreach ( $webhooks as $webhook_id ) {
@@ -391,22 +371,19 @@ class WC_Admin_Webhooks {
 		if ( isset( $_GET['trashed'] ) ) {
 			$trashed = absint( $_GET['trashed'] );
 
-			/* translators: %d: count */
-			WC_Admin_Settings::add_message( sprintf( _n( '%d webhook moved to the Trash.', '%d webhooks moved to the Trash.', $trashed, 'woocommerce' ), $trashed ) );
+			WC_Admin_Settings::add_message( sprintf( _n( '1 webhook moved to the Trash.', '%d webhooks moved to the Trash.', $trashed, 'woocommerce' ), $trashed ) );
 		}
 
 		if ( isset( $_GET['untrashed'] ) ) {
 			$untrashed = absint( $_GET['untrashed'] );
 
-			/* translators: %d: count */
-			WC_Admin_Settings::add_message( sprintf( _n( '%d webhook restored from the Trash.', '%d webhooks restored from the Trash.', $untrashed, 'woocommerce' ), $untrashed ) );
+			WC_Admin_Settings::add_message( sprintf( _n( '1 webhook restored from the Trash.', '%d webhooks restored from the Trash.', $untrashed, 'woocommerce' ), $untrashed ) );
 		}
 
 		if ( isset( $_GET['deleted'] ) ) {
 			$deleted = absint( $_GET['deleted'] );
 
-			/* translators: %d: count */
-			WC_Admin_Settings::add_message( sprintf( _n( '%d webhook permanently deleted.', '%d webhooks permanently deleted.', $deleted, 'woocommerce' ), $deleted ) );
+			WC_Admin_Settings::add_message( sprintf( _n( '1 webhook permanently deleted.', '%d webhooks permanently deleted.', $deleted, 'woocommerce' ), $deleted ) );
 		}
 
 		if ( isset( $_GET['updated'] ) ) {
@@ -426,30 +403,18 @@ class WC_Admin_Webhooks {
 	 * Table list output.
 	 */
 	private static function table_list_output() {
-		echo '<h2>' . __( 'Webhooks', 'woocommerce' ) . ' <a href="' . esc_url( wp_nonce_url( admin_url( 'admin.php?page=wc-settings&tab=api&section=webhooks&create-webhook=1' ), 'create-webhook' ) ) . '" class="add-new-h2">' . __( 'Add webhook', 'woocommerce' ) . '</a></h2>';
+		echo '<h2>' . __( 'Webhooks', 'woocommerce' ) . ' <a href="' . esc_url( wp_nonce_url( admin_url( 'admin.php?page=wc-settings&tab=api&section=webhooks&create-webhook=1' ), 'create-webhook' ) ) . '" class="add-new-h2">' . __( 'Add Webhook', 'woocommerce' ) . '</a></h2>';
 
-		// Get the webhooks count
-		$count = array_sum( (array) wp_count_posts( 'shop_webhook', 'readable' ) );
+		$webhooks_table_list = new WC_Admin_Webhooks_Table_List();
+		$webhooks_table_list->prepare_items();
 
-		if ( absint( $count ) && $count > 0 ) {
-			$webhooks_table_list = new WC_Admin_Webhooks_Table_List();
-			$webhooks_table_list->prepare_items();
+		echo '<input type="hidden" name="page" value="wc-settings" />';
+		echo '<input type="hidden" name="tab" value="api" />';
+		echo '<input type="hidden" name="section" value="webhooks" />';
 
-			echo '<input type="hidden" name="page" value="wc-settings" />';
-			echo '<input type="hidden" name="tab" value="api" />';
-			echo '<input type="hidden" name="section" value="webhooks" />';
-
-			$webhooks_table_list->views();
-			$webhooks_table_list->search_box( __( 'Search webhooks', 'woocommerce' ), 'webhook' );
-			$webhooks_table_list->display();
-		} else {
-			echo '<div class="woocommerce-BlankState woocommerce-BlankState--webhooks">';
-			?>
-			<h2 class="woocommerce-BlankState-message"><?php _e( 'Webhooks are event notifications sent to URLs of your choice. They can be used to integrate with third-party services which support them.', 'woocommerce' ); ?></h2>
-			<a class="woocommerce-BlankState-cta button-primary button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wc-settings&tab=api&section=webhooks&create-webhook=1' ), 'create-webhook' ) ); ?>"><?php _e( 'Create a new webhook', 'woocommerce' ); ?></a>
-
-			<?php echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions  { display: none; } </style></div>';
-		}
+		$webhooks_table_list->views();
+		$webhooks_table_list->search_box( __( 'Search Webhooks', 'woocommerce' ), 'webhook' );
+		$webhooks_table_list->display();
 	}
 
 	/**
@@ -463,7 +428,7 @@ class WC_Admin_Webhooks {
 			'post_id' => $webhook->id,
 			'status'  => 'approve',
 			'type'    => 'webhook_delivery',
-			'number'  => 10,
+			'number'  => 10
 		);
 
 		if ( 1 < $current ) {
@@ -477,7 +442,7 @@ class WC_Admin_Webhooks {
 		add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_webhook_comments' ), 10, 1 );
 
 		if ( $logs ) {
-			include_once( dirname( __FILE__ ) . '/settings/views/html-webhook-logs.php' );
+			include_once( 'settings/views/html-webhook-logs.php' );
 		} else {
 			echo '<p>' . __( 'This Webhook has no log yet.', 'woocommerce' ) . '</p>';
 		}
@@ -485,8 +450,6 @@ class WC_Admin_Webhooks {
 
 	/**
 	 * Get the webhook topic data.
-	 *
-	 * @param WC_Webhook $webhook
 	 *
 	 * @return array
 	 */
@@ -500,7 +463,7 @@ class WC_Admin_Webhooks {
 
 			if ( 'action' === $resource ) {
 				$topic = 'action';
-			} elseif ( ! in_array( $resource, array( 'coupon', 'customer', 'order', 'product' ) ) ) {
+			} else if ( ! in_array( $resource, array( 'coupon', 'customer', 'order', 'product' ) ) ) {
 				$topic = 'custom';
 			}
 		}
@@ -508,7 +471,7 @@ class WC_Admin_Webhooks {
 		return array(
 			'topic'    => $topic,
 			'event'    => $event,
-			'resource' => $resource,
+			'resource' => $resource
 		);
 	}
 
@@ -516,7 +479,6 @@ class WC_Admin_Webhooks {
 	 * Get the logs navigation.
 	 *
 	 * @param  int $total
-	 * @param  WC_Webhook $webhook
 	 *
 	 * @return string
 	 */
@@ -527,13 +489,7 @@ class WC_Admin_Webhooks {
 		$html = '<div class="webhook-logs-navigation">';
 
 			$html .= '<p class="info" style="float: left;"><strong>';
-			/* translators: 1: items count (i.e. 8 items) 2: current page 3: total pages */
-			$html .= sprintf(
-				__( '%1$s &ndash; Page %2$d of %3$d', 'woocommerce' ),
-				sprintf( _n( '%d item', '%d items', $total, 'woocommerce' ), $total ),
-				$current,
-				$pages
-			);
+			$html .= sprintf( '%s &ndash; Page %d of %d', _n( '1 item', sprintf( '%d items', $total ), $total, 'woocommerce' ), $current, $pages );
 			$html .= '</strong></p>';
 
 			if ( 1 < $pages ) {

@@ -28,11 +28,6 @@ if ( ! is_network_admin() ) {
 }
 
 $installed_themes = search_theme_directories();
-
-if ( false === $installed_themes ) {
-	$installed_themes = array();
-}
-
 foreach ( $installed_themes as $k => $v ) {
 	if ( false !== strpos( $k, '/' ) ) {
 		unset( $installed_themes[ $k ] );
@@ -62,7 +57,7 @@ wp_localize_script( 'theme', '_wpThemeSettings', array(
 		'noThemesFound'       => __( 'No themes found. Try a different search.' ),
 		'collapseSidebar'     => __( 'Collapse Sidebar' ),
 		'expandSidebar'       => __( 'Expand Sidebar' ),
-		/* translators: accessibility text */
+		/* translators: hidden accessibility text */
 		'selectFeatureFilter' => __( 'Select one or more Theme features to filter by' ),
 	),
 	'installedThemes' => array_keys( $installed_themes ),
@@ -124,9 +119,8 @@ include(ABSPATH . 'wp-admin/admin-header.php');
 
 ?>
 <div class="wrap">
-	<h1 class="wp-heading-inline"><?php echo esc_html( $title ); ?></h1>
-
-	<?php
+	<h1><?php
+	echo esc_html( $title );
 
 	/**
 	 * Filters the tabs shown on the Add Themes screen.
@@ -141,10 +135,7 @@ include(ABSPATH . 'wp-admin/admin-header.php');
 	if ( ! empty( $tabs['upload'] ) && current_user_can( 'upload_themes' ) ) {
 		echo ' <button type="button" class="upload-view-toggle page-title-action hide-if-no-js" aria-expanded="false">' . __( 'Upload Theme' ) . '</button>';
 	}
-	?>
-
-	<hr class="wp-header-end">
-
+	?></h1>
 	<div class="error hide-if-js">
 		<p><?php _e( 'The Theme Installer screen requires JavaScript.' ); ?></p>
 	</div>
@@ -169,7 +160,7 @@ include(ABSPATH . 'wp-admin/admin-header.php');
 
 		<button type="button" class="button drawer-toggle" aria-expanded="false"><?php _e( 'Feature Filter' ); ?></button>
 
-		<form class="search-form"></form>
+		<div class="search-form"></div>
 
 		<div class="favorites-form">
 			<?php

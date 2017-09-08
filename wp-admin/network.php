@@ -15,7 +15,7 @@ define( 'WP_INSTALLING_NETWORK', true );
 /** WordPress Administration Bootstrap */
 require_once( dirname( __FILE__ ) . '/admin.php' );
 
-if ( ! current_user_can( 'setup_network' ) ) {
+if ( ! is_super_admin() ) {
 	wp_die( __( 'Sorry, you are not allowed to manage options for this site.' ) );
 }
 

@@ -35,7 +35,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 		);
 
 		# GET /webhooks/count
-		$routes[ $this->base . '/count' ] = array(
+		$routes[ $this->base . '/count'] = array(
 			array( array( $this, 'get_webhooks_count' ), WC_API_Server::READABLE ),
 		);
 
@@ -63,12 +63,9 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * Get all webhooks
 	 *
 	 * @since 2.2
-	 *
 	 * @param array $fields
 	 * @param array $filter
-	 * @param string $status
 	 * @param int $page
-	 *
 	 * @return array
 	 */
 	public function get_webhooks( $fields = null, $filter = array(), $status = null, $page = 1 ) {
@@ -103,7 +100,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * @since 2.2
 	 * @param int $id webhook ID
 	 * @param array $fields
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function get_webhook( $id, $fields = null ) {
 
@@ -136,11 +133,9 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * Get the total number of webhooks
 	 *
 	 * @since 2.2
-	 *
 	 * @param string $status
 	 * @param array $filter
-	 *
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function get_webhooks_count( $status = null, $filter = array() ) {
 		try {
@@ -164,10 +159,8 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * Create an webhook
 	 *
 	 * @since 2.2
-	 *
 	 * @param array $data parsed webhook data
-	 *
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function create_webhook( $data ) {
 
@@ -180,14 +173,14 @@ class WC_API_Webhooks extends WC_API_Resource {
 
 			// permission check
 			if ( ! current_user_can( 'publish_shop_webhooks' ) ) {
-				throw new WC_API_Exception( 'woocommerce_api_user_cannot_create_webhooks', __( 'You do not have permission to create webhooks.', 'woocommerce' ), 401 );
+				throw new WC_API_Exception( 'woocommerce_api_user_cannot_create_webhooks', __( 'You do not have permission to create webhooks', 'woocommerce' ), 401 );
 			}
 
 			$data = apply_filters( 'woocommerce_api_create_webhook_data', $data, $this );
 
 			// validate topic
 			if ( empty( $data['topic'] ) || ! wc_is_webhook_valid_topic( strtolower( $data['topic'] ) ) ) {
-				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_topic', __( 'Webhook topic is required and must be valid.', 'woocommerce' ), 400 );
+				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_topic', __( 'Webhook topic is required and must be valid', 'woocommerce' ), 400 );
 			}
 
 			// validate delivery URL
@@ -201,9 +194,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 				'ping_status'   => 'closed',
 				'post_author'   => get_current_user_id(),
 				'post_password' => strlen( ( $password = uniqid( 'webhook_' ) ) ) > 20 ? substr( $password, 0, 20 ) : $password,
-				// @codingStandardsIgnoreStart
 				'post_title'    => ! empty( $data['name'] ) ? $data['name'] : sprintf( __( 'Webhook created on %s', 'woocommerce' ), strftime( _x( '%b %d, %Y @ %I:%M %p', 'Webhook created on date parsed by strftime', 'woocommerce' ) ) ),
-				// @codingStandardsIgnoreEnd
 			), $data, $this );
 
 			$webhook_id = wp_insert_post( $webhook_data );
@@ -220,9 +211,6 @@ class WC_API_Webhooks extends WC_API_Resource {
 
 			// set secret if provided, defaults to API users consumer secret
 			$webhook->set_secret( ! empty( $data['secret'] ) ? $data['secret'] : '' );
-
-			// Set API version to legacy v3.
-			$webhook->set_api_version( 'legacy_v3' );
 
 			// send ping
 			$webhook->deliver_ping();
@@ -246,11 +234,9 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * Edit a webhook
 	 *
 	 * @since 2.2
-	 *
 	 * @param int $id webhook ID
 	 * @param array $data parsed webhook data
-	 *
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function edit_webhook( $id, $data ) {
 
@@ -279,7 +265,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 					$webhook->set_topic( $data['topic'] );
 
 				} else {
-					throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_topic', __( 'Webhook topic must be valid.', 'woocommerce' ), 400 );
+					throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_topic', __( 'Webhook topic must be valid', 'woocommerce' ), 400 );
 				}
 			}
 
@@ -307,7 +293,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 			// update user ID
 			$webhook_data = array(
 				'ID'          => $webhook->id,
-				'post_author' => get_current_user_id(),
+				'post_author' => get_current_user_id()
 			);
 
 			// update name
@@ -335,7 +321,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 *
 	 * @since 2.2
 	 * @param int $id webhook ID
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function delete_webhook( $id ) {
 
@@ -401,7 +387,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * @since 2.2
 	 * @param string $webhook_id webhook ID
 	 * @param string|null $fields fields to include in response
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function get_webhook_deliveries( $webhook_id, $fields = null ) {
 
@@ -434,12 +420,10 @@ class WC_API_Webhooks extends WC_API_Resource {
 	 * Get the delivery log for the given webhook ID and delivery ID
 	 *
 	 * @since 2.2
-	 *
 	 * @param string $webhook_id webhook ID
 	 * @param string $id delivery log ID
 	 * @param string|null $fields fields to limit response to
-	 *
-	 * @return array|WP_Error
+	 * @return array
 	 */
 	public function get_webhook_delivery( $webhook_id, $id, $fields = null ) {
 		try {
@@ -453,7 +437,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 			$id = absint( $id );
 
 			if ( empty( $id ) ) {
-				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_delivery_id', __( 'Invalid webhook delivery ID.', 'woocommerce' ), 404 );
+				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_delivery_id', __( 'Invalid webhook delivery ID', 'woocommerce' ), 404 );
 			}
 
 			$webhook = new WC_Webhook( $webhook_id );
@@ -461,7 +445,7 @@ class WC_API_Webhooks extends WC_API_Resource {
 			$log = $webhook->get_delivery_log( $id );
 
 			if ( ! $log ) {
-				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_delivery_id', __( 'Invalid webhook delivery.', 'woocommerce' ), 400 );
+				throw new WC_API_Exception( 'woocommerce_api_invalid_webhook_delivery_id', __( 'Invalid webhook delivery', 'woocommerce' ), 400 );
 			}
 
 			$delivery_log = $log;
@@ -477,4 +461,5 @@ class WC_API_Webhooks extends WC_API_Resource {
 			return new WP_Error( $e->getErrorCode(), $e->getMessage(), array( 'status' => $e->getCode() ) );
 		}
 	}
+
 }

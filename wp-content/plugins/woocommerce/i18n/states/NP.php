@@ -9,14 +9,10 @@
  */
 global $states;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 $states['NP'] = array(
 	'BAG' => __( 'Bagmati', 'woocommerce' ),
 	'BHE' => __( 'Bheri', 'woocommerce' ),
-	'DHA' => __( 'Dhaulagiri', 'woocommerce' ),
+	'DHA' => __( 'Dhawalagiri', 'woocommerce' ),
 	'GAN' => __( 'Gandaki', 'woocommerce' ),
 	'JAN' => __( 'Janakpur', 'woocommerce' ),
 	'KAR' => __( 'Karnali', 'woocommerce' ),
@@ -27,5 +23,5 @@ $states['NP'] = array(
 	'NAR' => __( 'Narayani', 'woocommerce' ),
 	'RAP' => __( 'Rapti', 'woocommerce' ),
 	'SAG' => __( 'Sagarmatha', 'woocommerce' ),
-	'SET' => __( 'Seti', 'woocommerce' ),
+	'SET' => __( 'Seti', 'woocommerce' )
 );

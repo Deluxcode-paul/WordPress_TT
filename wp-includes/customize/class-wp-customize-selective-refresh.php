@@ -43,7 +43,7 @@ final class WP_Customize_Selective_Refresh {
 	 * Log of errors triggered when partials are rendered.
 	 *
 	 * @since 4.5.0
-	 * @access protected
+	 * @access private
 	 * @var array
 	 */
 	protected $triggered_errors = array();
@@ -52,7 +52,7 @@ final class WP_Customize_Selective_Refresh {
 	 * Keep track of the current partial being rendered.
 	 *
 	 * @since 4.5.0
-	 * @access protected
+	 * @access private
 	 * @var string
 	 */
 	protected $current_partial_id;
@@ -88,29 +88,10 @@ final class WP_Customize_Selective_Refresh {
 	 * Adds a partial.
 	 *
 	 * @since 4.5.0
+	 * @access public
 	 *
 	 * @param WP_Customize_Partial|string $id   Customize Partial object, or Panel ID.
-	 * @param array                       $args {
-	 *  Optional. Array of properties for the new Partials object. Default empty array.
-	 *
-	 *  @type string   $type                  Type of the partial to be created.
-	 *  @type string   $selector              The jQuery selector to find the container element for the partial, that is, a partial's placement.
-	 *  @type array    $settings              IDs for settings tied to the partial.
-	 *  @type string   $primary_setting       The ID for the setting that this partial is primarily responsible for
-	 *                                        rendering. If not supplied, it will default to the ID of the first setting.
-	 *  @type string   $capability            Capability required to edit this partial.
-	 *                                        Normally this is empty and the capability is derived from the capabilities
-	 *                                        of the associated `$settings`.
-	 *  @type callable $render_callback       Render callback.
-	 *                                        Callback is called with one argument, the instance of WP_Customize_Partial.
-	 *                                        The callback can either echo the partial or return the partial as a string,
-	 *                                        or return false if error.
-	 *  @type bool     $container_inclusive   Whether the container element is included in the partial, or if only
-	 *                                        the contents are rendered.
-	 *  @type bool     $fallback_refresh      Whether to refresh the entire preview in case a partial cannot be refreshed.
-	 *                                        A partial render is considered a failure if the render_callback returns
-	 *                                        false.
-	 * }
+	 * @param array                       $args Optional. Partial arguments. Default empty array.
 	 * @return WP_Customize_Partial             The instance of the panel that was added.
 	 */
 	public function add_partial( $id, $args = array() ) {
@@ -119,10 +100,10 @@ final class WP_Customize_Selective_Refresh {
 		} else {
 			$class = 'WP_Customize_Partial';
 
-			/** This filter is documented in wp-includes/customize/class-wp-customize-selective-refresh.php */
+			/** This filter (will be) documented in wp-includes/class-wp-customize-manager.php */
 			$args = apply_filters( 'customize_dynamic_partial_args', $args, $id );
 
-			/** This filter is documented in wp-includes/customize/class-wp-customize-selective-refresh.php */
+			/** This filter (will be) documented in wp-includes/class-wp-customize-manager.php */
 			$class = apply_filters( 'customize_dynamic_partial_class', $class, $id, $args );
 
 			$partial = new $class( $this, $id, $args );
@@ -306,7 +287,7 @@ final class WP_Customize_Selective_Refresh {
 	 * These errors will be relayed back to the client in the Ajax response.
 	 *
 	 * @since 4.5.0
-	 * @access public
+	 * @access private
 	 *
 	 * @param int    $errno   Error number.
 	 * @param string $errstr  Error string.

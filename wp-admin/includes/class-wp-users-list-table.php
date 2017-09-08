@@ -258,7 +258,6 @@ class WP_Users_List_Table extends WP_List_Table {
 	 */
 	protected function extra_tablenav( $which ) {
 		$id = 'bottom' === $which ? 'new_role2' : 'new_role';
-		$button_id = 'bottom' === $which ? 'changeit2' : 'changeit';
 	?>
 	<div class="alignleft actions">
 		<?php if ( current_user_can( 'promote_users' ) && $this->has_items() ) : ?>
@@ -268,7 +267,7 @@ class WP_Users_List_Table extends WP_List_Table {
 			<?php wp_dropdown_roles(); ?>
 		</select>
 	<?php
-			submit_button( __( 'Change' ), '', $button_id, false );
+			submit_button( __( 'Change' ), '', 'changeit', false );
 		endif;
 
 		/**
@@ -296,7 +295,7 @@ class WP_Users_List_Table extends WP_List_Table {
 	 * @return string The bulk action required.
 	 */
 	public function current_action() {
-		if ( ( isset( $_REQUEST['changeit'] ) || isset( $_REQUEST['changeit2'] ) ) &&
+		if ( isset( $_REQUEST['changeit'] ) &&
 			( ! empty( $_REQUEST['new_role'] ) || ! empty( $_REQUEST['new_role2'] ) ) ) {
 			return 'promote';
 		}
@@ -373,11 +372,11 @@ class WP_Users_List_Table extends WP_List_Table {
 	 * @since 4.4.0 The `$role` parameter was deprecated.
 	 * @access public
 	 *
-	 * @param WP_User $user_object The current user object.
-	 * @param string  $style       Deprecated. Not used.
-	 * @param string  $role        Deprecated. Not used.
-	 * @param int     $numposts    Optional. Post count to display for this user. Defaults
-	 *                             to zero, as in, a new user has made zero posts.
+	 * @param object $user_object The current user object.
+	 * @param string $style       Deprecated. Not used.
+	 * @param string $role        Deprecated. Not used.
+	 * @param int    $numposts    Optional. Post count to display for this user. Defaults
+	 *                            to zero, as in, a new user has made zero posts.
 	 * @return string Output for a single row.
 	 */
 	public function single_row( $user_object, $style = '', $role = '', $numposts = 0 ) {

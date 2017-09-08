@@ -155,8 +155,6 @@ class WP_REST_Post_Types_Controller extends WP_REST_Controller {
 		$taxonomies = wp_list_filter( get_object_taxonomies( $post_type->name, 'objects' ), array( 'show_in_rest' => true ) );
 		$taxonomies = wp_list_pluck( $taxonomies, 'name' );
 		$base = ! empty( $post_type->rest_base ) ? $post_type->rest_base : $post_type->name;
-		$supports = get_all_post_type_supports( $post_type->name );
-
 		$data = array(
 			'capabilities' => $post_type->cap,
 			'description'  => $post_type->description,
@@ -164,7 +162,6 @@ class WP_REST_Post_Types_Controller extends WP_REST_Controller {
 			'labels'       => $post_type->labels,
 			'name'         => $post_type->label,
 			'slug'         => $post_type->name,
-			'supports'     => $supports,
 			'taxonomies'   => array_values( $taxonomies ),
 			'rest_base'    => $base,
 		);
@@ -246,12 +243,6 @@ class WP_REST_Post_Types_Controller extends WP_REST_Controller {
 					'description'  => __( 'An alphanumeric identifier for the post type.' ),
 					'type'         => 'string',
 					'context'      => array( 'view', 'edit', 'embed' ),
-					'readonly'     => true,
-				),
-				'supports'         => array(
-					'description'  => __( 'All features, supported by the post type.' ),
-					'type'         => 'object',
-					'context'      => array( 'edit' ),
 					'readonly'     => true,
 				),
 				'taxonomies'       => array(

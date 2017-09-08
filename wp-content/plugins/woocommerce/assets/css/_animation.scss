@@ -2,8 +2,8 @@
  * _animation.scss
  * Custom WooCommerce Animations.
  */
-@keyframes spin {
+@include keyframes( spin ) {
 	100% {
-		transform: rotate( 360deg );
+		@include transform( rotate(360deg) );
 	}
 }

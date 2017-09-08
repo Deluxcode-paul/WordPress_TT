@@ -4,7 +4,7 @@ Theme URI: https://wordpress.org/themes/twentyseventeen/
 Author: the WordPress team
 Author URI: https://wordpress.org/
 Description: Twenty Seventeen brings your site to life with header video and immersive featured images. With a focus on business sites, it features multiple sections on the front page as well as widgets, navigation and social menus, a logo, and more. Personalize its asymmetrical grid with a custom color scheme and showcase your multimedia content with post formats. Our default theme for 2017 works great in many languages, for any abilities, and on any device.
-Version: 1.3
+Version: 1.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: twentyseventeen
@@ -451,8 +451,7 @@ h1 {
 	font-weight: 300;
 }
 
-h2,
-.home.blog .entry-title {
+h2 {
 	color: #666;
 	font-size: 20px;
 	font-size: 1.25rem;
@@ -670,14 +669,6 @@ html[lang^="zh-"] input,
 html[lang^="zh-"] select,
 html[lang^="zh-"] textarea {
 	font-family: "PingFang TC", "Helvetica Neue", Helvetica, STHeitiTC-Light, Arial, sans-serif;
-}
-
-html[lang="zh-CN"] body,
-html[lang="zh-CN"] button,
-html[lang="zh-CN"] input,
-html[lang="zh-CN"] select,
-html[lang="zh-CN"] textarea {
-	font-family: "PingFang SC", "Helvetica Neue", Helvetica, STHeitiSC-Light, Arial, sans-serif;
 }
 
 html[lang^="zh-"] h1,
@@ -2161,7 +2152,12 @@ body:not(.twentyseventeen-front-page) .entry-header {
 	display: inline-block;
 }
 
-.entry-footer .edit-link a.post-edit-link {
+
+.main-navigation a {
+    display: inline-block;
+}
+
+.entry-footer .edit-link a.post-edit-link, .buy-film {
 	background-color: #222;
 	-webkit-border-radius: 2px;
 	border-radius: 2px;
@@ -2533,8 +2529,7 @@ h2.widget-title {
 	margin: 0;
 }
 
-.widget ul li,
-.widget ol li {
+.widget ul li {
 	border-bottom: 1px solid #ddd;
 	border-top: 1px solid #ddd;
 	padding: 0.5em 0;
@@ -2593,42 +2588,6 @@ h2.widget-title {
 
 .widget_text {
 	word-wrap: break-word;
-}
-
-.widget_text ul {
-	list-style: disc;
-	margin: 0 0 1.5em 1.5em;
-}
-
-.widget_text ol {
-	list-style: decimal;
-}
-
-.widget_text ul li,
-.widget_text ol li {
-	border: none;
-}
-
-.widget_text ul li:last-child,
-.widget_text ol li:last-child {
-	padding-bottom: 0;
-}
-
-.widget_text ul li ul {
-	margin: 0 0 0 1.5em;
-}
-
-.widget_text ul li li {
-	padding-left: 0;
-	padding-right: 0;
-}
-
-.widget_text ol li {
-	list-style-position: inside;
-}
-
-.widget_text ol li + li {
-	margin-top: -1px;
 }
 
 /* RSS Widget */
@@ -3191,7 +3150,6 @@ object {
 	}
 
 	h2,
-	.home.blog .entry-title,
 	.page .panel-content .recent-posts .entry-title {
 		font-size: 26px;
 		font-size: 1.625rem;
@@ -4281,13 +4239,9 @@ object {
 	}
 }
 
-.main-navigation a {
-   display: inline-block;
-}
 
 
-
-.add_favourit_link {
+.add_to_cart_film {
     background-color: #222;
     border: 0;
     -webkit-border-radius: 2px;
@@ -4306,7 +4260,31 @@ object {
     transition: background 0.2s;
 }
 
-.add_favourit_link:hover {
+.add_to_cart_film:hover {
    background: #767676;
    color: #fff;
+}
+
+.add_favourit_link {
+	background-color: #222;
+	border: 0;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 1rem;
+	line-height: 1.5;
+	font-weight: 800;
+	padding: 1em 2em;
+	text-shadow: none;
+	-webkit-transition: background 0.2s;
+	transition: background 0.2s;
+}
+
+.add_favourit_link:hover {
+	background: #767676;
+	color: #fff;
 }

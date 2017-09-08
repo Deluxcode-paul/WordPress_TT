@@ -608,10 +608,14 @@ div.mce-path {
 }
 
 /* Menubar */
-div.mce-menubar {
+.mce-menubar {
 	border-color: #e5e5e5;
 	background: #fff;
 	border-width: 0px 0px 1px;
+}
+
+.mce-menubar .mce-menubtn {
+	margin: 2px;
 }
 
 .mce-menubar .mce-menubtn:hover,
@@ -1087,7 +1091,6 @@ i.mce-i-wp_code:before {
 
 .wp-editor-container {
 	clear: both;
-	border: 1px solid #e5e5e5;
 }
 
 .wp-editor-area {

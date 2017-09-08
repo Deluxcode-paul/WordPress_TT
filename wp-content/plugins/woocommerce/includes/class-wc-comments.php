@@ -22,7 +22,6 @@ class WC_Comments {
 	 */
 	public static function init() {
 		// Rating posts
-		add_filter( 'comments_open', array( __CLASS__, 'comments_open' ), 10, 2 );
 		add_filter( 'preprocess_comment', array( __CLASS__, 'check_comment_rating' ), 0 );
 		add_action( 'comment_post', array( __CLASS__, 'add_comment_rating' ), 1 );
 		add_action( 'comment_moderation_recipients', array( __CLASS__, 'comment_moderation_recipients' ), 10, 2 );
@@ -32,10 +31,12 @@ class WC_Comments {
 
 		// Secure order notes
 		add_filter( 'comments_clauses', array( __CLASS__, 'exclude_order_comments' ), 10, 1 );
+		add_action( 'comment_feed_join', array( __CLASS__, 'exclude_order_comments_from_feed_join' ) );
 		add_action( 'comment_feed_where', array( __CLASS__, 'exclude_order_comments_from_feed_where' ) );
 
 		// Secure webhook comments
 		add_filter( 'comments_clauses', array( __CLASS__, 'exclude_webhook_comments' ), 10, 1 );
+		add_action( 'comment_feed_join', array( __CLASS__, 'exclude_webhook_comments_from_feed_join' ) );
 		add_action( 'comment_feed_where', array( __CLASS__, 'exclude_webhook_comments_from_feed_where' ) );
 
 		// Count comments
@@ -53,21 +54,6 @@ class WC_Comments {
 	}
 
 	/**
-	 * See if comments are open.
-	 *
-	 * @since  3.1.0
-	 * @param  bool $open
-	 * @param  int $post_id
-	 * @return bool
-	 */
-	public static function comments_open( $open, $post_id ) {
-		if ( 'product' === get_post_type( $post_id ) && ! post_type_supports( 'product', 'comments' ) ) {
-			$open = false;
-		}
-		return $open;
-	}
-
-	/**
 	 * Exclude order comments from queries and RSS.
 	 *
 	 * This code should exclude shop_order comments from queries. Some queries (like the recent comments widget on the dashboard) are hardcoded.
@@ -79,25 +65,59 @@ class WC_Comments {
 	 * @return array
 	 */
 	public static function exclude_order_comments( $clauses ) {
-		$clauses['where'] .= ( $clauses['where'] ? ' AND ' : '' ) . " comment_type != 'order_note' ";
+		global $wpdb, $typenow;
+
+		if ( is_admin() && in_array( $typenow, wc_get_order_types() ) && current_user_can( 'manage_woocommerce' ) ) {
+			return $clauses; // Don't hide when viewing orders in admin
+		}
+
+		if ( ! $clauses['join'] ) {
+			$clauses['join'] = '';
+		}
+
+		if ( ! stristr( $clauses['join'], "JOIN $wpdb->posts ON" ) ) {
+			$clauses['join'] .= " LEFT JOIN $wpdb->posts ON comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		if ( $clauses['where'] ) {
+			$clauses['where'] .= ' AND ';
+		}
+
+		$clauses['where'] .= " $wpdb->posts.post_type NOT IN ('" . implode( "','", wc_get_order_types() ) . "') ";
+
 		return $clauses;
 	}
 
 	/**
-	 * @deprecated 3.1
+	 * Exclude order comments from queries and RSS.
+	 * @param  string $join
+	 * @return string
 	 */
 	public static function exclude_order_comments_from_feed_join( $join ) {
-		wc_deprecated_function( 'WC_Comments::exclude_order_comments_from_feed_join', '3.1' );
+		global $wpdb;
+
+		if ( ! stristr( $join, "JOIN $wpdb->posts ON" ) ) {
+			$join = " LEFT JOIN $wpdb->posts ON $wpdb->comments.comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		return $join;
 	}
 
 	/**
 	 * Exclude order comments from queries and RSS.
-	 *
 	 * @param  string $where
 	 * @return string
 	 */
 	public static function exclude_order_comments_from_feed_where( $where ) {
-		return $where . ( $where ? ' AND ' : '' ) . " comment_type != 'order_note' ";
+		global $wpdb;
+
+		if ( $where ) {
+			$where .= ' AND ';
+		}
+
+		$where .= " $wpdb->posts.post_type NOT IN ('" . implode( "','", wc_get_order_types() ) . "') ";
+
+		return $where;
 	}
 
 	/**
@@ -107,15 +127,39 @@ class WC_Comments {
 	 * @return array
 	 */
 	public static function exclude_webhook_comments( $clauses ) {
-		$clauses['where'] .= ( $clauses['where'] ? ' AND ' : '' ) . " comment_type != 'webhook_delivery' ";
+		global $wpdb;
+
+		if ( ! $clauses['join'] ) {
+			$clauses['join'] = '';
+		}
+
+		if ( ! strstr( $clauses['join'], "JOIN $wpdb->posts" ) ) {
+			$clauses['join'] .= " LEFT JOIN $wpdb->posts ON comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		if ( $clauses['where'] ) {
+			$clauses['where'] .= ' AND ';
+		}
+
+		$clauses['where'] .= " $wpdb->posts.post_type <> 'shop_webhook' ";
+
 		return $clauses;
 	}
 
 	/**
-	 * @deprecated 3.1
+	 * Exclude webhook comments from queries and RSS.
+	 * @since  2.2
+	 * @param  string $join
+	 * @return string
 	 */
 	public static function exclude_webhook_comments_from_feed_join( $join ) {
-		wc_deprecated_function( 'WC_Comments::exclude_webhook_comments_from_feed_join', '3.1' );
+		global $wpdb;
+
+		if ( ! strstr( $join, $wpdb->posts ) ) {
+			$join = " LEFT JOIN $wpdb->posts ON $wpdb->comments.comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		return $join;
 	}
 
 	/**
@@ -125,21 +169,36 @@ class WC_Comments {
 	 * @return string
 	 */
 	public static function exclude_webhook_comments_from_feed_where( $where ) {
-		return $where . ( $where ? ' AND ' : '' ) . " comment_type != 'webhook_delivery' ";
+		global $wpdb;
+
+		if ( $where ) {
+			$where .= ' AND ';
+		}
+
+		$where .= " $wpdb->posts.post_type <> 'shop_webhook' ";
+
+		return $where;
 	}
 
 	/**
 	 * Validate the comment ratings.
-	 *
 	 * @param  array $comment_data
 	 * @return array
 	 */
 	public static function check_comment_rating( $comment_data ) {
 		// If posting a comment (not trackback etc) and not logged in
-		if ( ! is_admin() && isset( $_POST['comment_post_ID'], $_POST['rating'], $comment_data['comment_type'] ) && 'product' === get_post_type( $_POST['comment_post_ID'] ) && empty( $_POST['rating'] ) && '' === $comment_data['comment_type'] && 'yes' === get_option( 'woocommerce_enable_review_rating' ) && 'yes' === get_option( 'woocommerce_review_rating_required' ) ) {
+		if (
+			! is_admin()
+			&& 'product' === get_post_type( $_POST['comment_post_ID'] )
+			&& empty( $_POST['rating'] )
+			&& '' === $comment_data['comment_type']
+			&& 'yes' === get_option( 'woocommerce_enable_review_rating' )
+			&& 'yes' === get_option( 'woocommerce_review_rating_required' )
+		) {
 			wp_die( __( 'Please rate the product.', 'woocommerce' ) );
 			exit;
 		}
+
 		return $comment_data;
 	}
 
@@ -153,11 +212,6 @@ class WC_Comments {
 				return;
 			}
 			add_comment_meta( $comment_id, 'rating', (int) esc_attr( $_POST['rating'] ), true );
-
-			$post_id = isset( $_POST['comment_post_ID'] ) ? (int) $_POST['comment_post_ID'] : 0;
-			if ( $post_id ) {
-				self::clear_transients( $post_id );
-			}
 		}
 	}
 
@@ -182,13 +236,9 @@ class WC_Comments {
 	 * @param int $post_id
 	 */
 	public static function clear_transients( $post_id ) {
-
-		if ( 'product' === get_post_type( $post_id ) ) {
-			$product = wc_get_product( $post_id );
-			self::get_rating_counts_for_product( $product );
-			self::get_average_rating_for_product( $product );
-			self::get_review_count_for_product( $product );
-		}
+		delete_post_meta( $post_id, '_wc_average_rating' );
+		delete_post_meta( $post_id, '_wc_rating_count' );
+		delete_post_meta( $post_id, '_wc_review_count' );
 	}
 
 	/**
@@ -285,98 +335,6 @@ class WC_Comments {
 			add_comment_meta( $comment_id, 'verified', (int) $verified, true );
 		}
 		return $verified;
-	}
-
-	/**
-	 * Get product rating for a product. Please note this is not cached.
-	 *
-	 * @since 3.0.0
-	 * @param WC_Product $product
-	 * @return float
-	 */
-	public static function get_average_rating_for_product( &$product ) {
-		global $wpdb;
-
-		$count = $product->get_rating_count();
-
-		if ( $count ) {
-			$ratings = $wpdb->get_var( $wpdb->prepare("
-				SELECT SUM(meta_value) FROM $wpdb->commentmeta
-				LEFT JOIN $wpdb->comments ON $wpdb->commentmeta.comment_id = $wpdb->comments.comment_ID
-				WHERE meta_key = 'rating'
-				AND comment_post_ID = %d
-				AND comment_approved = '1'
-				AND meta_value > 0
-			", $product->get_id() ) );
-			$average = number_format( $ratings / $count, 2, '.', '' );
-		} else {
-			$average = 0;
-		}
-
-		$product->set_average_rating( $average );
-
-		$data_store = $product->get_data_store();
-		$data_store->update_average_rating( $product );
-
-		return $average;
-	}
-
-	/**
-	 * Get product review count for a product (not replies). Please note this is not cached.
-	 *
-	 * @since 3.0.0
-	 * @param WC_Product $product
-	 * @return int
-	 */
-	public static function get_review_count_for_product( &$product ) {
-		global $wpdb;
-
-		$count = $wpdb->get_var( $wpdb->prepare("
-			SELECT COUNT(*) FROM $wpdb->comments
-			WHERE comment_parent = 0
-			AND comment_post_ID = %d
-			AND comment_approved = '1'
-		", $product->get_id() ) );
-
-		$product->set_review_count( $count );
-
-		$data_store = $product->get_data_store();
-		$data_store->update_review_count( $product );
-
-		return $count;
-	}
-
-	/**
-	 * Get product rating count for a product. Please note this is not cached.
-	 *
-	 * @since 3.0.0
-	 * @param WC_Product $product
-	 * @return array of integers
-	 */
-	public static function get_rating_counts_for_product( &$product ) {
-		global $wpdb;
-
-		$counts     = array();
-		$raw_counts = $wpdb->get_results( $wpdb->prepare( "
-			SELECT meta_value, COUNT( * ) as meta_value_count FROM $wpdb->commentmeta
-			LEFT JOIN $wpdb->comments ON $wpdb->commentmeta.comment_id = $wpdb->comments.comment_ID
-			WHERE meta_key = 'rating'
-			AND comment_post_ID = %d
-			AND comment_approved = '1'
-			AND meta_value > 0
-			GROUP BY meta_value
-		", $product->get_id() ) );
-
-		foreach ( $raw_counts as $count ) {
-			$counts[ $count->meta_value ] = absint( $count->meta_value_count );
-		}
-
-		$product->set_rating_counts( $counts );
-
-		$data_store = $product->get_data_store();
-		$data_store->update_rating_counts( $product );
-
-		return $counts;
 	}
 }
 

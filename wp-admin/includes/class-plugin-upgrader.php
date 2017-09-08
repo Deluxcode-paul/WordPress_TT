@@ -406,7 +406,7 @@ class Plugin_Upgrader extends WP_Upgrader {
 			return $return;
 
 		// When in cron (background updates) don't deactivate the plugin, as we require a browser to reactivate it
-		if ( wp_doing_cron() )
+		if ( defined( 'DOING_CRON' ) && DOING_CRON )
 			return $return;
 
 		$plugin = isset($plugin['plugin']) ? $plugin['plugin'] : '';

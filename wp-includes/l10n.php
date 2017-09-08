@@ -753,7 +753,7 @@ function load_muplugin_textdomain( $domain, $mu_plugin_rel_path = '' ) {
 		return true;
 	}
 
-	$path = WPMU_PLUGIN_DIR . '/' . ltrim( $mu_plugin_rel_path, '/' );
+	$path = trailingslashit( WPMU_PLUGIN_DIR . '/' . ltrim( $mu_plugin_rel_path, '/' ) );
 
 	return load_textdomain( $domain, $path . '/' . $mofile );
 }
