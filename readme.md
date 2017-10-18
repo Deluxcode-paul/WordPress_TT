@@ -1,1 +1,2 @@
-Test task for The Coding Ninjas
+# Woocommerce Core Customisation
+Only for clients review
